@@ -1,0 +1,35 @@
+{
+  "registry_version": null,
+  "network": "rabbit-mainnet",
+  "chain_id": 928,
+  "genesis_hash": null,
+  "generated_at": null,
+  "contracts": [
+    {
+      "allocation_id": "liquidity",
+      "name": null,
+      "address": null,
+      "deployment_transaction": null,
+      "funding_transaction": null,
+      "initial_balance_rab": 2000000,
+      "source_commit": null,
+      "verified_source_url": null,
+      "compiler": null,
+      "optimizer": null,
+      "constructor_arguments": null,
+      "bytecode_hash": null,
+      "proxy_address": null,
+      "implementation_address": null,
+      "upgradeable": null,
+      "pausable": null,
+      "revocable": null,
+      "owner": null,
+      "guardian": null,
+      "multisig_signers": [],
+      "multisig_threshold": null,
+      "timelock_seconds": null,
+      "security_review": null
+    }
+  ],
+  "notes": "Expand the contracts array to cover every contract-controlled allocation. Null values are forbidden in the final mainnet registry."
+}

@@ -1,0 +1,67 @@
+{
+  "document_version": "0.9",
+  "status": "pre-mainnet",
+  "native_asset": "RAB",
+  "maximum_supply_rab": 15000000,
+  "amounts_are_authoritative": true,
+  "percentages_are_display_only": true,
+  "allocations": [
+    {
+      "id": "participation_protocol",
+      "label": "Staking and protocol participation",
+      "amount_rab": 10000000,
+      "enforcement": "genesis_consensus_or_immutable_distribution",
+      "address": null
+    },
+    {
+      "id": "liquidity",
+      "label": "Liquidity",
+      "amount_rab": 2000000,
+      "enforcement": "public_vault_or_disclosed_address",
+      "address": null
+    },
+    {
+      "id": "community",
+      "label": "Rabbit Club/community",
+      "amount_rab": 1000000,
+      "enforcement": "public_treasury_or_distribution_vault",
+      "address": null
+    },
+    {
+      "id": "operations",
+      "label": "Operational costs",
+      "amount_rab": 400000,
+      "enforcement": "separate_public_operations_treasury",
+      "address": null
+    },
+    {
+      "id": "testnet_rewards",
+      "label": "Testnet participation rewards",
+      "amount_rab": 100000,
+      "enforcement": "dedicated_fixed_cap_reward_vault",
+      "address": null,
+      "source_note": "Carved out of the former 500000 RAB operational allocation; not additional issuance",
+      "categories": {
+        "miners": 50000,
+        "builders": 30000,
+        "testers": 15000,
+        "valid_bug_hunters": 5000
+      }
+    },
+    {
+      "id": "creator_developers",
+      "label": "Creator and developers",
+      "amount_rab": 1500000,
+      "enforcement": "public_vesting_vault",
+      "address": null,
+      "vesting": {
+        "cliff_after_official_liquidity_months": 6,
+        "initial_release_rab": 150000,
+        "remaining_installments": 24,
+        "amount_per_installment_rab": 56250,
+        "installment_interval": null,
+        "liquidity_start_reference": null
+      }
+    }
+  ]
+}

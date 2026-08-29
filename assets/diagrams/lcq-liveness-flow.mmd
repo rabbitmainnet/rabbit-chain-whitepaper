@@ -1,0 +1,12 @@
+flowchart TD
+    A[Canonical LCQ queue] --> B[Expected producer]
+    B --> C{Valid block inside slot?}
+    C -- Yes --> D[Verify EVM result, seal, rewards, and LCQ rules]
+    D --> E[Accept canonical block]
+    C -- No --> F[Timeout and fallback window]
+    F --> G[Next permitted queue position]
+    G --> C
+    G --> H{No eligible producer remains?}
+    H -- Yes --> I[Chain waits without rewriting history]
+    I --> J[Valid participation returns]
+    J --> A

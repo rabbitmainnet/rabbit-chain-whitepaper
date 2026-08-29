@@ -1,0 +1,43 @@
+name: Documentation correction
+description: Report a factual, economic, technical, or presentation issue in the Rabbit Chain whitepaper.
+title: "docs: "
+labels: [documentation]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Exact location
+      description: Section, table, diagram, field, or file.
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current statement
+    validations:
+      required: true
+  - type: textarea
+    id: correction
+    attributes:
+      label: Proposed correction
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Reproducible evidence
+      description: Link a primary source, source commit, genesis/configuration field, block, transaction, or reproducible test.
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      options:
+        - Security
+        - Economics
+        - Consensus or compatibility
+        - Infrastructure or endpoints
+        - Presentation only
+    validations:
+      required: true

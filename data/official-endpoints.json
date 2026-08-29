@@ -1,0 +1,29 @@
+{
+  "document_version": "0.9",
+  "status_meaning": "reserved is not live; active requires DNS, TLS, chain identity, and health verification",
+  "shared": {
+    "website": {"url": "https://rabbitchain.org/", "status": "active"},
+    "documentation": {"url": "https://docs.rabbitchain.org/", "status": "reserved"},
+    "status": {"url": "https://status.rabbitchain.org/", "status": "reserved"},
+    "downloads": {"url": "https://rabbitchain.org/downloads", "status": "planned"},
+    "github": {"url": "https://github.com/rabbitmainnet", "status": "active"}
+  },
+  "testnet": {
+    "chain_id": 9280,
+    "rpc_http": {"url": "https://rpc-testnet.rabbitchain.org/", "status": "reserved"},
+    "rpc_websocket": {"url": "wss://rpc-testnet.rabbitchain.org/ws", "status": "reserved"},
+    "explorer": {"url": "https://explorer-testnet.rabbitchain.org/", "status": "reserved"},
+    "faucet": {"url": "https://faucet-testnet.rabbitchain.org/", "status": "reserved"},
+    "genesis_hash": null,
+    "bootnodes": []
+  },
+  "mainnet": {
+    "chain_id": 928,
+    "rpc_http": {"url": "https://rpc.rabbitchain.org/", "status": "reserved"},
+    "rpc_websocket": {"url": "wss://rpc.rabbitchain.org/ws", "status": "reserved"},
+    "explorer": {"url": "https://explorer.rabbitchain.org/", "status": "reserved"},
+    "faucet": null,
+    "genesis_hash": null,
+    "bootnodes": []
+  }
+}
