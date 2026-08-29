@@ -8,16 +8,28 @@
     {
       "allocation_id": "liquidity",
       "name": null,
-      "address": null,
+      "deployment_method": null,
+      "deployer_or_factory": null,
+      "deployer_nonce": null,
+      "create2_salt": null,
+      "init_code_hash": null,
+      "predicted_address": null,
+      "address_derivation_proof_url": null,
+      "genesis_balance_proof": null,
+      "predeployment_code_hash": null,
+      "deployment_window": "first_mainnet_blocks",
+      "deployment_block": null,
+      "deployed_address": null,
       "deployment_transaction": null,
-      "funding_transaction": null,
       "initial_balance_rab": 2000000,
+      "postdeployment_balance_rab": null,
       "source_commit": null,
       "verified_source_url": null,
       "compiler": null,
       "optimizer": null,
       "constructor_arguments": null,
-      "bytecode_hash": null,
+      "creation_bytecode_hash": null,
+      "runtime_bytecode_hash": null,
       "proxy_address": null,
       "implementation_address": null,
       "upgradeable": null,
@@ -28,8 +40,9 @@
       "multisig_signers": [],
       "multisig_threshold": null,
       "timelock_seconds": null,
-      "security_review": null
+      "security_review": null,
+      "verification_status": "not_deployed"
     }
   ],
-  "notes": "Expand the contracts array to cover every contract-controlled allocation. Null values are forbidden in the final mainnet registry."
+  "notes": "Expand the contracts array to cover liquidity, community, operations, testnet rewards, and creator/developers. Genesis funds each predicted address without code. The exact contract is deployed in the published first-mainnet-block window. Null values required by the chosen CREATE/CREATE2 method are forbidden in the final registry; method-inapplicable fields must be explicitly marked not_applicable."
 }

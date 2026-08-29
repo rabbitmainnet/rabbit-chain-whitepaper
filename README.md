@@ -7,8 +7,6 @@
 
 > One eligible wallet. One fair chance.
 
-**[Download the rendered PDF](docs/Rabbit-Chain-Whitepaper-v0.9.pdf)**
-
 ---
 
 ## Document status
@@ -71,7 +69,9 @@ The intended user path is deliberately short:
 
 Registration and activation are protocol-driven. The client resolves the local participant, submits valid work, observes activation rules, and joins the deterministic queue when eligible.
 
-![From RandomX work to a canonical Rabbit block](assets/diagrams/mining-lcq-flow.png)
+<p align="center">
+  <img src="assets/diagrams/mining-lcq-flow.png" width="820" alt="From RandomX work to a canonical Rabbit block">
+</p>
 
 *Figure 1. Work qualifies a wallet for a bounded canonical seat; the LCQ queue, rather than a continuing hash race, schedules block production.*
 
@@ -205,7 +205,9 @@ If participation falls to zero, the chain may stop rather than fabricate work or
 
 This recovery model has a trade-off: safety remains tied to verifiable history, but time to resume depends on valid work, participant eligibility, and propagation.
 
-![LCQ producer slot, fallback, and recovery](assets/diagrams/lcq-liveness-flow.png)
+<p align="center">
+  <img src="assets/diagrams/lcq-liveness-flow.png" width="820" alt="LCQ producer slot, fallback, and recovery">
+</p>
 
 *Figure 2. A missed producer advances through public fallback rules. If no eligible participant remains, the chain waits and later resumes from preserved canonical history.*
 
@@ -258,14 +260,14 @@ Because RAB is the native asset of Rabbit Chain rather than an ordinary ERC-20 t
 
 - **genesis and consensus rules**, which define initial native balances, issuance, rewards, locks, and supply behavior;
 - **public vault/vesting contracts**, which hold allocations that require time-based or rule-based release;
-- **public treasury addresses**, used only where human operational spending is unavoidable;
+- **public treasury contracts**, used where human-approved operational spending is unavoidable and governed by disclosed multisig/timelock rules;
 - **versioned disclosures**, which connect every allocation to an address, balance, contract, rule, and responsible signing policy.
 
 The absence of a single ERC-20 contract must never be confused with absence of on-chain verification. Native balances, consensus issuance, contract balances, releases, and transfers remain observable through a validating node and block explorer.
 
 ### 7.2 Allocation enforcement plan
 
-Before mainnet block 1, the final genesis and release package must publish the enforcement method for every allocation:
+Before mainnet block 1, the final genesis and release package must publish the enforcement method for every allocation. The genesis file creates the native balances, but it does **not** contain the deployed bytecode of the treasury, reward, liquidity, or vesting contracts. Those contracts are deployed by canonical transactions in the first mainnet blocks, as described in Section 7.3.
 
 | Allocation | Amount | Required enforcement and disclosure |
 |---|---:|---|
@@ -276,9 +278,42 @@ Before mainnet block 1, the final genesis and release package must publish the e
 | Testnet participation rewards | 100,000 RAB | Dedicated reward vault; cannot be spent for operations, liquidity, creator compensation, or unrelated community programs |
 | Creator and developers | 1,500,000 RAB | Public vesting vault enforcing the announced cliff and installment schedule |
 
-Logical contract names in this paper are descriptions, not deployed addresses. Final contract names, addresses, bytecode, verified source, compiler settings, constructor arguments, ownership, and transaction hashes will be inserted only after deployment. No placeholder address should be presented as final.
+Logical contract names in this paper are descriptions, not deployed addresses. Before mainnet, the registry must publish each precomputed contract address and all inputs needed to reproduce it. Deployment block numbers and transaction hashes can only be filled after the first mainnet blocks are canonical. No placeholder address may be presented as deployed or verified.
 
-### 7.3 Creator and developer vesting
+### 7.3 Deterministic deployment in the first mainnet blocks
+
+Rabbit Chain will use a two-stage launch for contract-controlled allocations:
+
+**Stage 1 — Genesis reserves the native RAB balances.** Each contract-controlled allocation is assigned to a precomputed, contract-creation address. At block 0 that address has the disclosed RAB balance but no contract code and no controlling externally owned account key.
+
+**Stage 2 — The first canonical mainnet blocks deploy the contracts.** The exact audited creation transactions install the treasury, liquidity, reward, and vesting bytecode at the precomputed addresses. The balance already present at each address then becomes controlled by that contract's verified rules.
+
+This is not a claim that contracts exist before mainnet. A precomputed address is only a deterministic destination. Until the expected bytecode is deployed and verified, its allocation must remain unusable.
+
+The final deployment manifest must publish, for every contract:
+
+- whether `CREATE` or `CREATE2` is used and the exact derivation formula;
+- deployer or factory address, deployer nonce or salt, initialization-code hash, compiler version, optimizer settings, libraries, and constructor arguments;
+- predicted contract address and its exact genesis RAB balance;
+- creation bytecode and expected runtime-bytecode hash;
+- deployment order and the permitted first-block deployment window;
+- owner, administrator, multisig signers, threshold, timelock, upgrade, pause, and recovery powers;
+- deployment transaction, canonical block, resulting runtime-bytecode hash, events, and post-deployment balance.
+
+The procedure must be rehearsed from a fresh candidate genesis before launch. For each deployment, independent checks must prove `predicted address = deployed address`, `expected runtime hash = observed runtime hash`, and `genesis balance = post-deployment balance` before any release, transfer, liquidity action, reward claim, or treasury spending is permitted. A wrong address, wrong bytecode, wrong owner, wrong balance, missing transaction, or deployment outside the published window fails the mainnet launch gate. The affected reserve remains unavailable; it must not be redirected to an undisclosed replacement address.
+
+The planned sequence is:
+
+| Stage | Canonical action | Public evidence |
+|---|---|---|
+| Block 0 | Create the 10,000,000 RAB protocol allocation and fund the five precomputed contract addresses totaling 5,000,000 RAB | Genesis file, hashes, balance proof, address-derivation manifest |
+| First mainnet blocks | Deploy the exact liquidity, community, operations, testnet-reward, and creator/developer contracts | Transactions, receipts, creation and runtime bytecode, verified source |
+| Verification gate | Compare predicted and actual addresses, code hashes, balances, roles, limits, and timelocks | Reproducible verification report and contract registry |
+| Activation | Permit each contract's intended use only after its verification passes | Public status, activation transaction if applicable, explorer links |
+
+Exact deployment block numbers are not invented in this pre-testnet edition. They will be frozen in the signed mainnet deployment manifest after the full testnet rehearsal and before mainnet genesis is released.
+
+### 7.4 Creator and developer vesting
 
 The creator/developer allocation is planned to remain locked until six months after official mainnet liquidity begins. Ten percent of that allocation is then scheduled for release, with the remaining ninety percent released over 24 subsequent installments. This is a policy commitment to be encoded or enforced through publicly auditable mechanisms before mainnet.
 
@@ -292,17 +327,17 @@ Applied to 1,500,000 RAB, the intended schedule is:
 
 The final contract must define the installment interval, liquidity-start reference, timestamp/block semantics, beneficiary addresses, rounding behavior, revocability, transferability, and treatment of compromised keys. Until those fields are frozen in verified code, this schedule is an economic commitment but not yet a deployed enforcement claim.
 
-### 7.4 Transparency standard for contracts and treasuries
+### 7.5 Transparency standard for contracts and treasuries
 
 Every contract or address holding an allocated RAB reserve must have a public registry entry containing:
 
 - allocation name and exact RAB amount;
 - network and chain ID;
-- genesis address or deployment address;
+- precomputed address, address-derivation inputs, genesis funding proof, deployment address, block, and transaction;
 - deployment and funding transaction hashes;
 - verified source code and exact Git commit;
 - compiler version, optimization settings, constructor arguments, and linked libraries;
-- immutable contract bytecode hash;
+- creation-bytecode and runtime-bytecode hashes;
 - owner, administrator, guardian, pauser, upgrader, and beneficiary powers;
 - multisig signers by public address, signing threshold, and replacement procedure;
 - timelock duration and every function exempt from the timelock;
@@ -316,7 +351,7 @@ Where discretion is unavoidable, Rabbit Chain should use separated allocation ad
 
 No private agreement may override the public rules. Emergency, pause, upgrade, recovery, sweep, recipient-change, arbitrary-call, self-destruct, or token-rescue permissions must be documented prominently rather than hidden in source code.
 
-### 7.5 Reporting and reconciliation
+### 7.6 Reporting and reconciliation
 
 At launch and at regular intervals, Rabbit Chain should publish an allocation reconciliation that third parties can reproduce:
 
@@ -328,9 +363,11 @@ For each reserved allocation:
 
 Reports must link to raw addresses and transactions rather than rely only on screenshots or manually entered totals. Corrections must remain in public version history; an incorrect prior report should not be silently replaced.
 
-![Auditable RAB allocation structure](assets/diagrams/rab-allocation-transparency.png)
+<p align="center">
+  <img src="assets/diagrams/rab-allocation-transparency.png" width="820" alt="Auditable RAB allocation structure">
+</p>
 
-*Figure 3. Native consensus balances and public vault/treasury balances converge in one reproducible allocation registry.*
+*Figure 3. Genesis funds deterministic future contract addresses; verified contracts are then deployed at those exact addresses in the first mainnet blocks.*
 
 The table is an allocation ceiling and disclosure, not a forecast of market value. Circulating supply at any moment depends on genesis allocation, protocol issuance, locks, vesting, rewards, fee burning where applicable, and any provably inaccessible balances.
 
@@ -551,6 +588,8 @@ The roadmap is gate-driven rather than date-driven.
 - complete independent security review appropriate to the final scope;
 - finalize issuance, halving, lock, vesting, and fee policies;
 - finalize mainnet genesis with public hashes and review window;
+- publish and rehearse the deterministic contract-address and first-block deployment manifest;
+- deploy every allocation contract in the published first-block window and verify its address, runtime bytecode, balance, roles, and restrictions before activation;
 - prepare incident-response and responsible-disclosure processes;
 - launch entirely fresh mainnet infrastructure and state.
 
@@ -564,7 +603,7 @@ This pre-testnet edition deliberately fixes the document structure before final 
 | Final source/release commit | Signed tag, source archive, reproducible build record, and binary hashes |
 | Bootnodes | Complete enode/ENR records, regions, operators, and connectivity test |
 | RPC/explorer/status services | DNS, TLS certificate, health check, chain ID, genesis identity, and operator disclosure |
-| Allocation addresses | Address, label, exact initial balance, funding/genesis proof, and allocation sum |
+| Allocation contracts | Precomputed address and derivation inputs before launch; genesis funding proof; then deployment block/transaction, runtime hash, roles, exact balance, and verification status |
 | Contract addresses | Deployment transaction, verified source, bytecode hash, constructor arguments, and security review |
 | Multisigs and timelocks | Signer addresses, threshold, relationships, delay, guarded functions, and replacement policy |
 | Vesting start reference | Objective liquidity activation transaction/event and resulting timestamp/block |

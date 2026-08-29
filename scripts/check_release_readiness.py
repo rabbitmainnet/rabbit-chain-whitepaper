@@ -27,6 +27,23 @@ if args.phase == "mainnet":
         problems.append("contract registry is still a template")
     if any(item["address"] is None for item in allocation["allocations"]):
         problems.append("one or more allocation addresses are unresolved")
+    contract_allocations = [item for item in allocation["allocations"] if item["id"] != "participation_protocol"]
+    if any(item.get("deployment_status") != "verified" for item in contract_allocations):
+        problems.append("one or more allocation contracts are not deployed and verified")
+    required_contract_ids = {item["id"] for item in contract_allocations}
+    registry_by_id = {item["allocation_id"]: item for item in registry["contracts"]}
+    if set(registry_by_id) != required_contract_ids:
+        problems.append("contract registry does not cover every contract-controlled allocation exactly once")
+    for allocation_id, item in registry_by_id.items():
+        for key in ("deployment_method", "predicted_address", "genesis_balance_proof",
+                    "deployment_block", "deployed_address", "deployment_transaction",
+                    "creation_bytecode_hash", "runtime_bytecode_hash"):
+            if item.get(key) is None:
+                problems.append(f"{allocation_id} {key} is unresolved")
+        if item.get("predicted_address") != item.get("deployed_address"):
+            problems.append(f"{allocation_id} deployed address differs from predicted address")
+        if item.get("verification_status") != "verified":
+            problems.append(f"{allocation_id} contract verification is incomplete")
     creator = next(item for item in allocation["allocations"] if item["id"] == "creator_developers")
     if creator["vesting"]["installment_interval"] is None:
         problems.append("creator installment interval is unresolved")

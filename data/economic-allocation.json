@@ -11,28 +11,38 @@
       "label": "Staking and protocol participation",
       "amount_rab": 10000000,
       "enforcement": "genesis_consensus_or_immutable_distribution",
-      "address": null
+      "address": null,
+      "genesis_account_type": "consensus_allocation"
     },
     {
       "id": "liquidity",
       "label": "Liquidity",
       "amount_rab": 2000000,
-      "enforcement": "public_vault_or_disclosed_address",
-      "address": null
+      "enforcement": "first_block_public_liquidity_vault",
+      "address": null,
+      "genesis_account_type": "precomputed_contract_address_without_code",
+      "deployment_window": "first_mainnet_blocks",
+      "deployment_status": "not_deployed"
     },
     {
       "id": "community",
       "label": "Rabbit Club/community",
       "amount_rab": 1000000,
-      "enforcement": "public_treasury_or_distribution_vault",
-      "address": null
+      "enforcement": "first_block_public_community_treasury",
+      "address": null,
+      "genesis_account_type": "precomputed_contract_address_without_code",
+      "deployment_window": "first_mainnet_blocks",
+      "deployment_status": "not_deployed"
     },
     {
       "id": "operations",
       "label": "Operational costs",
       "amount_rab": 400000,
-      "enforcement": "separate_public_operations_treasury",
-      "address": null
+      "enforcement": "first_block_separate_operations_treasury",
+      "address": null,
+      "genesis_account_type": "precomputed_contract_address_without_code",
+      "deployment_window": "first_mainnet_blocks",
+      "deployment_status": "not_deployed"
     },
     {
       "id": "testnet_rewards",
@@ -40,6 +50,9 @@
       "amount_rab": 100000,
       "enforcement": "dedicated_fixed_cap_reward_vault",
       "address": null,
+      "genesis_account_type": "precomputed_contract_address_without_code",
+      "deployment_window": "first_mainnet_blocks",
+      "deployment_status": "not_deployed",
       "source_note": "Carved out of the former 500000 RAB operational allocation; not additional issuance",
       "categories": {
         "miners": 50000,
@@ -54,6 +67,9 @@
       "amount_rab": 1500000,
       "enforcement": "public_vesting_vault",
       "address": null,
+      "genesis_account_type": "precomputed_contract_address_without_code",
+      "deployment_window": "first_mainnet_blocks",
+      "deployment_status": "not_deployed",
       "vesting": {
         "cliff_after_official_liquidity_months": 6,
         "initial_release_rab": 150000,

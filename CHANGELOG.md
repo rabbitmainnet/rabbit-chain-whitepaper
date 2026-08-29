@@ -2,6 +2,14 @@
 
 All material changes to the Rabbit Chain whitepaper and its machine-readable disclosures are recorded here.
 
+## [0.9-r1] - 2026-08-29
+
+- Clarifies that allocation contracts are not deployed in genesis.
+- Defines genesis funding of precomputed contract addresses and deterministic deployment in the first mainnet blocks.
+- Adds address-derivation, bytecode, balance, authority, deployment-window, and verification requirements.
+- Extends the machine-readable registry and mainnet readiness gate.
+- Reworks and resizes diagrams for clear GitHub and PDF rendering.
+
 ## [0.9] - 2026-08-29
 
 Pre-testnet technical edition.
