@@ -1,13 +1,8 @@
 flowchart TD
-    A[Wallet and Rabbit client] --> B[Canonical work context]
+    A[Wallet and synchronized client] --> B[Canonical work context]
     B --> C[RandomX proof search]
-    C --> D[Work V1 ticket]
-    D --> E{Proof and eligibility valid?}
-    E -- No --> F[Reject ticket]
-    E -- Yes --> G{Seat already exists for wallet and epoch?}
-    G -- Yes --> H[Keep one canonical seat]
-    G -- No --> I[Create canonical WorkSeat]
-    H --> J[Deterministic LCQ queue]
-    I --> J
-    J --> K[Scheduled producer builds and signs block]
-    K --> L[All nodes independently verify]
+    C --> D[Work V1 ticket validation]
+    D --> E[One canonical WorkSeat per wallet per epoch]
+    X[Same-wallet duplicate work] -. ignored .-> E
+    E --> F[Deterministic LCQ queue]
+    F --> G[Scheduled producer signs canonical block]

@@ -2,6 +2,12 @@
 
 All material changes to the Rabbit Chain whitepaper and its machine-readable disclosures are recorded here.
 
+## [0.9-r2] - 2026-08-29
+
+- Replaces fixed-width README diagram images with native responsive Mermaid diagrams.
+- Removes numbered labels and crossing annotation arrows from the PDF mining diagram.
+- Keeps PNG diagrams only as PDF and downloadable source assets.
+
 ## [0.9-r1] - 2026-08-29
 
 - Clarifies that allocation contracts are not deployed in genesis.

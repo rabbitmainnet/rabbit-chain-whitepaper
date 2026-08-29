@@ -69,9 +69,16 @@ The intended user path is deliberately short:
 
 Registration and activation are protocol-driven. The client resolves the local participant, submits valid work, observes activation rules, and joins the deterministic queue when eligible.
 
-<p align="center">
-  <img src="assets/diagrams/mining-lcq-flow.png" width="820" alt="From RandomX work to a canonical Rabbit block">
-</p>
+```mermaid
+flowchart TD
+    A[Wallet and synchronized client] --> B[Canonical work context]
+    B --> C[RandomX proof search]
+    C --> D[Work V1 ticket validation]
+    D --> E[One canonical WorkSeat per wallet per epoch]
+    X[Same-wallet duplicate work] -. ignored .-> E
+    E --> F[Deterministic LCQ queue]
+    F --> G[Scheduled producer signs canonical block]
+```
 
 *Figure 1. Work qualifies a wallet for a bounded canonical seat; the LCQ queue, rather than a continuing hash race, schedules block production.*
 
@@ -205,9 +212,17 @@ If participation falls to zero, the chain may stop rather than fabricate work or
 
 This recovery model has a trade-off: safety remains tied to verifiable history, but time to resume depends on valid work, participant eligibility, and propagation.
 
-<p align="center">
-  <img src="assets/diagrams/lcq-liveness-flow.png" width="820" alt="LCQ producer slot, fallback, and recovery">
-</p>
+```mermaid
+flowchart TD
+    A[Canonical LCQ queue] --> B[Expected producer]
+    B --> C{Valid block in slot?}
+    C -->|Yes| D[Verify block and accept]
+    C -->|No| E[Bounded fallback window]
+    E --> F[Check next permitted producer]
+    F --> B
+    F -->|No participant remains| G[Chain waits]
+    G -->|Participation returns| H[Resume preserved history]
+```
 
 *Figure 2. A missed producer advances through public fallback rules. If no eligible participant remains, the chain waits and later resumes from preserved canonical history.*
 
@@ -363,9 +378,16 @@ For each reserved allocation:
 
 Reports must link to raw addresses and transactions rather than rely only on screenshots or manually entered totals. Corrections must remain in public version history; an incorrect prior report should not be silently replaced.
 
-<p align="center">
-  <img src="assets/diagrams/rab-allocation-transparency.png" width="820" alt="Auditable RAB allocation structure">
-</p>
+```mermaid
+flowchart TD
+    A[15,000,000 RAB maximum supply]
+    A --> B[10,000,000 RAB protocol allocation]
+    A --> C[5,000,000 RAB at precomputed contract addresses]
+    C --> D[Contracts deployed in first mainnet blocks]
+    B --> E[Public supply reconciliation]
+    D --> F[Verify address, bytecode, balance, roles, and timelocks]
+    F --> E
+```
 
 *Figure 3. Genesis funds deterministic future contract addresses; verified contracts are then deployed at those exact addresses in the first mainnet blocks.*
 
