@@ -2,8 +2,8 @@
 
 ## A Permissionless EVM Layer 1 with Live Consensus Queue
 
-**Technical Whitepaper — Pre-Testnet Edition v0.9**
-**29 August 2026**
+**Technical Whitepaper - Pre-Testnet Edition v0.9-r3**
+**30 August 2026**
 
 > One eligible wallet. One fair chance.
 
@@ -237,13 +237,26 @@ Each canonical block divides the configured protocol reward between the producer
 
 The committee is derived deterministically from canonical participant state and bounded by configured minimum and maximum sizes. Reference pre-launch parameters use a minimum of 32 and maximum of 128 committee members, with a committee ratio of 3000 basis points. Small bootstrap or laboratory networks may operate under explicit special-case parameters; the released genesis controls the public network.
 
-Committee distribution is intended to spread rewards beyond the single scheduled producer and reward active consensus participation. Exact rounding, zero-recipient handling, vesting, and state-transition behavior are defined by the client implementation.
+Committee distribution is intended to spread rewards beyond the single scheduled producer and reward active consensus participation. When a valid committee is available, 70% goes to the block producer and 30% is divided among the committee under the client implementation's deterministic rounding rules. When no valid committee recipient exists, the producer receives 100% of that block's configured reward; no committee share is left unassigned.
 
-Early mining rewards are subject to protocol-enforced locking during the first 100,000 blocks, followed by automatic release under the finalized network schedule. The definitive unlock and halving rules must be published in genesis-linked release documentation before public launch.
+Mining rewards produced by the active consensus are credited immediately and are spendable after the block becomes canonical. The legacy first-100,000-block mining lock is not active and must not be presented as part of the live monetary policy. The separate 100,000 RAB testnet participation reserve described in Section 8 is an allocation program, not a lock on protocol mining rewards.
+
+### 6.1 Era and block-reward schedule
+
+The active reward calculation uses an era length of **8,409,600 blocks**. Era boundaries are derived from the canonical block number. Because block 0 is genesis and carries no mining reward, the first paid interval contains blocks 1 through 8,409,599. At block 8,409,600 the second reward level begins.
+
+| Reward period | Canonical blocks | Base reward per block | Policy |
+|---|---:|---:|---|
+| First reward period | 1-8,409,599 | 1.20 RAB | Initial block reward |
+| Second reward period | 8,409,600-16,819,199 | 0.60 RAB | First halving |
+| Third reward period | 16,819,200-25,228,799 | 0.30 RAB | Second halving |
+| Tail-emission period | 25,228,800 onward | 0.15 RAB | Final reward floor; no further halving |
+
+The 0.15 RAB reward continues permanently unless a future consensus change is adopted through a separately published network upgrade. Therefore Rabbit Chain has continuing tail emission and no finite maximum supply under the active schedule. For a block with a valid committee, the table gives the total base reward before the 70%/30% split. Without a valid committee, the producer receives the full amount.
 
 ## 7. RAB economic model
 
-RAB is the native asset used for gas, protocol rewards, bonding, and network-level economic accounting. The maximum supply and allocation ceiling is **15,000,000 RAB**. The testnet participation reserve is part of this fixed amount; it is not additional issuance.
+RAB is the native asset used for gas, protocol rewards, bonding, and network-level economic accounting. The genesis allocation is **15,000,000 RAB**. This is the complete block-0 allocation, not a maximum supply: consensus block rewards add new RAB according to Section 6.1, and the permanent 0.15 RAB tail reward means total supply is not finitely capped. The testnet participation reserve is part of the 15,000,000 RAB genesis allocation; it is not additional genesis allocation or a separate mint.
 
 | Allocation | RAB | Share |
 |---|---:|---:|
@@ -253,9 +266,9 @@ RAB is the native asset used for gas, protocol rewards, bonding, and network-lev
 | Operational costs | 400,000 | 2.67% |
 | Testnet participation rewards | 100,000 | 0.67% |
 | Creator and developers | 1,500,000 | 10.00% |
-| **Total** | **15,000,000** | **100.00%** |
+| **Total genesis allocation** | **15,000,000** | **100.00%** |
 
-Percentages are rounded to two decimal places. The integer RAB amounts, whose sum is exactly 15,000,000 RAB, are authoritative.
+Percentages are rounded to two decimal places. The integer RAB amounts, whose sum is exactly 15,000,000 RAB, are authoritative for genesis allocation only. They do not include later protocol issuance.
 
 The earlier 500,000 RAB operational allocation is therefore divided internally as follows:
 
@@ -263,13 +276,13 @@ The earlier 500,000 RAB operational allocation is therefore divided internally a
 |---|---:|---|
 | General operational costs | 400,000 | Infrastructure, security, legal/compliance, audits, software, communications, and documented project operations |
 | Public-testnet participation program | 100,000 | Reserved exclusively for eligible miners, builders, testers, and valid bug hunters under the published program rules |
-| **Combined amount** | **500,000** | **No change to total supply and no additional minting** |
+| **Combined amount** | **500,000** | **No change to the 15,000,000 RAB genesis allocation and no separate mint for this program** |
 
-**Supply identity:** `15,000,000 RAB = 10,000,000 + 2,000,000 + 1,000,000 + 400,000 + 100,000 + 1,500,000 RAB`.
+**Genesis-allocation identity:** `15,000,000 RAB = 10,000,000 + 2,000,000 + 1,000,000 + 400,000 + 100,000 + 1,500,000 RAB`.
 
-### 7.1 Supply invariant
+### 7.1 Genesis allocation and supply accounting
 
-The mainnet design must make the 15,000,000 RAB ceiling independently verifiable. No allocation table, website, multisig, vault, token interface, or off-chain statement may authorize balances beyond the rules enforced by the released genesis and consensus implementation.
+The mainnet design must make both components of supply independently verifiable: the 15,000,000 RAB genesis allocation and all later consensus issuance. No allocation table, website, multisig, vault, token interface, or off-chain statement may create balances outside the released genesis and consensus implementation.
 
 Because RAB is the native asset of Rabbit Chain rather than an ordinary ERC-20 token, not every monetary rule belongs in one token contract. Transparency is divided between:
 
@@ -380,22 +393,23 @@ Reports must link to raw addresses and transactions rather than rely only on scr
 
 ```mermaid
 flowchart TD
-    A[15,000,000 RAB maximum supply]
+    A[15,000,000 RAB genesis allocation]
     A --> B[10,000,000 RAB protocol allocation]
     A --> C[5,000,000 RAB at precomputed contract addresses]
+    B --> G[Consensus block rewards and permanent tail emission]
     C --> D[Contracts deployed in first mainnet blocks]
     B --> E[Public supply reconciliation]
     D --> F[Verify address, bytecode, balance, roles, and timelocks]
     F --> E
 ```
 
-*Figure 3. Genesis funds deterministic future contract addresses; verified contracts are then deployed at those exact addresses in the first mainnet blocks.*
+*Figure 3. Genesis allocates 15,000,000 RAB and funds deterministic future contract addresses. Consensus rewards then increase total supply under the published era schedule.*
 
-The table is an allocation ceiling and disclosure, not a forecast of market value. Circulating supply at any moment depends on genesis allocation, protocol issuance, locks, vesting, rewards, fee burning where applicable, and any provably inaccessible balances.
+The table is a genesis-allocation disclosure, not a maximum-supply claim or forecast of market value. Total issued supply at any block equals genesis allocation plus protocol rewards minus any provable burns. Circulating supply may be lower because of locks, vesting, treasury reserves, and provably inaccessible balances.
 
 ## 8. Testnet participation program
 
-The public testnet is intended to validate real activity from blocks 1 through 100,000. A planned **100,000 RAB mainnet reward pool** is reserved from the fixed 15,000,000 RAB allocation described in Section 7. It does not increase maximum supply and cannot also be counted as operational spending.
+The public testnet is intended to validate real activity from blocks 1 through 100,000. A planned **100,000 RAB mainnet reward pool** is reserved from the 15,000,000 RAB genesis allocation described in Section 7. It does not add to that genesis allocation and cannot also be counted as operational spending. This program is separate from protocol block rewards and their era schedule.
 
 | Category | Planned pool |
 |---|---:|
@@ -608,7 +622,7 @@ The roadmap is gate-driven rather than date-driven.
 
 - incorporate public-testnet findings;
 - complete independent security review appropriate to the final scope;
-- finalize issuance, halving, lock, vesting, and fee policies;
+- verify the published issuance, era, tail-emission, immediate-reward, vesting, and fee policies against the final client and genesis;
 - finalize mainnet genesis with public hashes and review window;
 - publish and rehearse the deterministic contract-address and first-block deployment manifest;
 - deploy every allocation contract in the published first-block window and verify its address, runtime bytecode, balance, roles, and restrictions before activation;
@@ -665,6 +679,10 @@ The following values describe the current pre-launch reference configuration. Th
 | Committee maximum | 128 |
 | Committee reward ratio | 3,000 bps |
 | Producer reward ratio | 7,000 bps |
+| Reward era length | 8,409,600 blocks |
+| Reward schedule | 1.20 -> 0.60 -> 0.30 -> 0.15 RAB |
+| Tail emission | 0.15 RAB per block permanently |
+| Mining-reward availability | Immediate after canonical credit |
 | Work proof | RandomX / Work V1 |
 | Reference proof difficulty | 100,000 |
 | Producer seal length | 65 bytes |
@@ -791,7 +809,8 @@ The project should be judged by reproducible code and observable network behavio
 
 | Version | Date | Description |
 |---|---|---|
-| 0.9 | 29 August 2026 | Pre-testnet technical edition; LCQ architecture, fixed 15,000,000 RAB allocation, 100,000 RAB testnet reserve sourced from the former operations allocation, contract/treasury transparency framework, validation evidence, risks, launch gates, participation guide, FAQ, and glossary |
+| 0.9-r3 | 30 August 2026 | Monetary-policy reconciliation: 15,000,000 RAB genesis allocation, active era schedule, permanent 0.15 RAB tail emission, immediate mining rewards, and committee zero-recipient behavior |
+| 0.9 | 29 August 2026 | Pre-testnet technical edition; LCQ architecture, 15,000,000 RAB genesis allocation, 100,000 RAB testnet reserve sourced from the former operations allocation, contract/treasury transparency framework, validation evidence, risks, launch gates, participation guide, FAQ, and glossary |
 
 ## Contact and official channels
 

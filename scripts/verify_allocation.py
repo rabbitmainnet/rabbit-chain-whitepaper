@@ -5,10 +5,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 data = json.loads((ROOT / "data" / "economic-allocation.json").read_text(encoding="utf-8"))
 
-maximum = data["maximum_supply_rab"]
+maximum = data["genesis_allocation_rab"]
 allocations = data["allocations"]
 total = sum(item["amount_rab"] for item in allocations)
-assert total == maximum, f"allocation total {total} != maximum supply {maximum}"
+assert total == maximum, f"allocation total {total} != genesis allocation {maximum}"
 
 ids = [item["id"] for item in allocations]
 assert len(ids) == len(set(ids)), "duplicate allocation id"
@@ -32,7 +32,9 @@ assert vesting_total == creator["amount_rab"], (
 )
 
 print("RAB_ALLOCATION_VERIFICATION=PASS")
-print(f"MAXIMUM_SUPPLY_RAB={maximum}")
+print(f"GENESIS_ALLOCATION_RAB={maximum}")
+print(f"FINITE_MAXIMUM_SUPPLY={str(data['finite_maximum_supply']).upper()}")
+print(f"TAIL_REWARD_RAB={data['reward_schedule']['tail_reward_rab']}")
 print(f"ALLOCATION_TOTAL_RAB={total}")
 print(f"TESTNET_REWARD_RESERVE_RAB={testnet['amount_rab']}")
 print(f"OPERATIONS_PLUS_TESTNET_RAB={operations['amount_rab'] + testnet['amount_rab']}")

@@ -2,7 +2,19 @@
   "document_version": "0.9",
   "status": "pre-mainnet",
   "native_asset": "RAB",
-  "maximum_supply_rab": 15000000,
+  "genesis_allocation_rab": 15000000,
+  "finite_maximum_supply": false,
+  "reward_schedule": {
+    "era_length_blocks": 8409600,
+    "base_reward_rab": [1.2, 0.6, 0.3, 0.15],
+    "tail_reward_rab": 0.15,
+    "tail_reward_continues": true,
+    "first_paid_block": 1,
+    "first_halving_block": 8409600,
+    "second_halving_block": 16819200,
+    "tail_emission_start_block": 25228800,
+    "mining_reward_lock_active": false
+  },
   "amounts_are_authoritative": true,
   "percentages_are_display_only": true,
   "allocations": [

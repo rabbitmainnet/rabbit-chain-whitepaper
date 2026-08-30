@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9-r3 - Monetary-policy reconciliation
+
+- Replaced the incorrect 15,000,000 RAB maximum-supply claim with the accurate 15,000,000 RAB genesis-allocation statement.
+- Published the active 8,409,600-block era calculation and the 1.20, 0.60, 0.30, and permanent 0.15 RAB reward levels.
+- Disclosed that the 0.15 RAB tail reward continues without further halving, so active consensus has no finite maximum supply.
+- Removed the inactive legacy first-100,000-block mining-lock claim and documented immediate canonical reward credit.
+- Clarified 70% producer / 30% committee distribution and the producer's 100% result when no valid committee recipient exists.
+- Regenerated the PDF with independent list numbering and updated economic tables and diagrams.
+
 All material changes to the Rabbit Chain whitepaper and its machine-readable disclosures are recorded here.
 
 ## [0.9-r2] - 2026-08-29
