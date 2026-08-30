@@ -15,6 +15,9 @@ registry = json.loads((ROOT / "data" / "contract-registry.template.json").read_t
 
 problems = []
 
+if allocation["document_version"] != endpoints["document_version"]:
+    problems.append("machine-readable document versions do not match")
+
 if args.phase == "mainnet":
     if endpoints["mainnet"]["genesis_hash"] is None:
         problems.append("mainnet genesis_hash is unresolved")
@@ -27,6 +30,13 @@ if args.phase == "mainnet":
         problems.append("contract registry is still a template")
     if any(item["address"] is None for item in allocation["allocations"]):
         problems.append("one or more allocation addresses are unresolved")
+    protocol_reserve = next(
+        item for item in allocation["allocations"]
+        if item["id"] == "participation_protocol"
+    )
+    for key in protocol_reserve["required_before_mainnet"]:
+        if protocol_reserve.get(key) is None:
+            problems.append(f"participation protocol reserve {key} is unresolved")
     contract_allocations = [item for item in allocation["allocations"] if item["id"] != "participation_protocol"]
     if any(item.get("deployment_status") != "verified" for item in contract_allocations):
         problems.append("one or more allocation contracts are not deployed and verified")

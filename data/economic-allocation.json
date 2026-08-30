@@ -1,5 +1,5 @@
 {
-  "document_version": "0.9",
+  "document_version": "0.9-r4",
   "status": "pre-mainnet",
   "native_asset": "RAB",
   "genesis_allocation_rab": 15000000,
@@ -20,11 +20,26 @@
   "allocations": [
     {
       "id": "participation_protocol",
-      "label": "Staking and protocol participation",
+      "label": "Staking and protocol participation reserve",
       "amount_rab": 10000000,
-      "enforcement": "genesis_consensus_or_immutable_distribution",
+      "enforcement": "genesis_reserve_separate_from_consensus_issuance",
       "address": null,
-      "genesis_account_type": "consensus_allocation"
+      "genesis_account_type": "disclosed_reserve_address_or_publicly_verifiable_mechanism",
+      "is_source_of_block_rewards": false,
+      "custody_mechanism": null,
+      "genesis_balance_proof": null,
+      "staking_or_participation_eligibility": null,
+      "release_destinations": null,
+      "authorization_policy": null,
+      "spending_limits": null,
+      "required_before_mainnet": [
+        "custody_mechanism",
+        "genesis_balance_proof",
+        "staking_or_participation_eligibility",
+        "release_destinations",
+        "authorization_policy",
+        "spending_limits"
+      ]
     },
     {
       "id": "liquidity",

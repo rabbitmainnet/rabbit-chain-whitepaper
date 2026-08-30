@@ -12,7 +12,7 @@ function CodeBlock(block)
       return pandoc.Div({
         pandoc.Para({pandoc.Strong("15,000,000 RAB genesis allocation")}),
         pandoc.BulletList({
-          {pandoc.Plain("10,000,000 RAB protocol allocation")},
+          {pandoc.Plain("10,000,000 RAB staking/participation genesis reserve, separate from block rewards")},
           {pandoc.Plain("5,000,000 RAB at precomputed contract addresses; verified contracts are deployed in the first mainnet blocks")},
           {pandoc.Plain("Consensus issuance: 1.20 -> 0.60 -> 0.30 -> 0.15 RAB per block")},
           {pandoc.Plain("Permanent tail emission: 0.15 RAB per block")}

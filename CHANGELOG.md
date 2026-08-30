@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9-r4 - Repository-wide consistency correction
+
+- Regenerated the allocation PNG so it no longer claims a fixed or maximum 15,000,000 RAB supply.
+- Synchronized the machine-readable economic document version with the whitepaper version.
+- Defined the 10,000,000 RAB staking/participation amount as a genesis reserve separate from consensus block-reward issuance.
+- Required public custody, balance, release, authorization, and spending evidence for that reserve before mainnet.
+- Clarified the activation formula and the release requirement to publish registration block, activation delay, and earliest activation block.
+- Regenerated and visually verified the complete PDF.
+
 ## v0.9-r3 - Monetary-policy reconciliation
 
 - Replaced the incorrect 15,000,000 RAB maximum-supply claim with the accurate 15,000,000 RAB genesis-allocation statement.
@@ -31,7 +40,7 @@ Pre-testnet technical edition.
 
 - Documents LCQ, Work V1, RandomX admission, WorkSeats, deterministic production, fallback, and recovery.
 - Records the validated same-wallet multi-process gate and evidence hashes.
-- Fixes the maximum allocation at 15,000,000 RAB.
+- Fixes the genesis allocation at 15,000,000 RAB.
 - Separates the former 500,000 RAB operations allocation into 400,000 RAB operations and 100,000 RAB public-testnet participation rewards.
 - Adds contract, vesting, treasury, reward-vault, reporting, and reconciliation transparency requirements.
 - Adds stable planned official endpoint names, each explicitly inactive until deployed and verified.

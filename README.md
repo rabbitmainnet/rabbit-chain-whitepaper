@@ -2,7 +2,7 @@
 
 ## A Permissionless EVM Layer 1 with Live Consensus Queue
 
-**Technical Whitepaper - Pre-Testnet Edition v0.9-r3**
+**Technical Whitepaper - Pre-Testnet Edition v0.9-r4**
 **30 August 2026**
 
 > One eligible wallet. One fair chance.
@@ -137,7 +137,9 @@ Eligibility is evaluated from historical canonical state, not from an unverified
 
 ### 3.3 Activation delay
 
-Newly observed participants do not receive immediate influence over the current queue. An activation delay separates registration from eligibility. This reduces rapid join/leave manipulation and gives the network time to propagate and agree on the participant's canonical state. The final public-testnet value must be read from the released genesis and chain configuration; earlier validation used explicit activation-delay scenarios.
+Newly observed participants do not receive immediate influence over the current queue. An activation delay separates canonical registration from eligibility. If a participant is registered at block `r` and the released network parameter is `ActivationDelay = d`, the earliest activation block is derived as `r + d`, subject to every other eligibility check still passing at that block. Registration therefore does not guarantee a seat or a block; after activation the wallet must still provide valid work, satisfy bond/activity/jail rules, obtain at most one canonical WorkSeat in the epoch, and wait for its deterministic queue position.
+
+The pre-testnet paper does not invent `d`. The exact public-testnet value must be copied from the finalized genesis/configuration into the release guide and parameters manifest before block 1. A release is incomplete if users cannot determine `registration block`, `ActivationDelay`, and `earliest activation block` from public data.
 
 ### 3.4 WorkSeat lifecycle
 
@@ -172,13 +174,14 @@ Consider Alice, who controls wallet `A`:
 1. Alice installs the official or reproducibly built Rabbit software and verifies its hash.
 2. Her node connects to peers and independently synchronizes the canonical chain.
 3. The client resolves wallet `A` as the local participant and observes the current registry, epoch, work context, bond, activity, and activation rules.
-4. Alice starts one miner process. It searches for a valid RandomX proof bound to the current challenge and dataset anchors.
-5. After finding a proof, the client submits a Work V1 ticket. Nodes independently validate the proof and participant state.
-6. Once the ticket is canonically recognized, wallet `A` may hold one WorkSeat for that epoch.
-7. Every honest node derives the same queue from canonical history. When `A` reaches the permitted production position, Alice's client builds and signs a block.
-8. Other nodes verify the expected producer, seal, transactions, EVM result, gas, rewards, and all LCQ rules before accepting it.
-9. If Alice opens two additional miners with wallet `A`, they may search redundantly, but wallet `A` must still receive no more than one canonical seat in that epoch.
-10. If Alice is offline during her turn, timeout and fallback rules allow the next permitted producer to advance liveness.
+4. If `A` is new, its canonical registration block is recorded. The client displays or derives the earliest activation block from the released `ActivationDelay`; Alice waits while the chain advances and keeps every other eligibility condition valid.
+5. Alice starts one miner process. It searches for a valid RandomX proof bound to the current challenge and dataset anchors.
+6. After finding a proof, the client submits a Work V1 ticket. Nodes independently validate the proof and participant state.
+7. Once the ticket is canonically recognized, wallet `A` may hold one WorkSeat for that epoch.
+8. Every honest node derives the same queue from canonical history. When `A` reaches the permitted production position, Alice's client builds and signs a block.
+9. Other nodes verify the expected producer, seal, transactions, EVM result, gas, rewards, and all LCQ rules before accepting it.
+10. If Alice opens two additional miners with wallet `A`, they may search redundantly, but wallet `A` must still receive no more than one canonical seat in that epoch.
+11. If Alice is offline during her turn, timeout and fallback rules allow the next permitted producer to advance liveness.
 
 Alice never asks an administrator to approve her wallet. She also cannot make herself eligible merely by editing a local configuration: canonical nodes recompute every relevant rule.
 
@@ -299,7 +302,7 @@ Before mainnet block 1, the final genesis and release package must publish the e
 
 | Allocation | Amount | Required enforcement and disclosure |
 |---|---:|---|
-| Staking and protocol participation | 10,000,000 RAB | Consensus-controlled issuance/reserve or an immutable distribution mechanism; exact reward, lock, halving, eligibility, and exhaustion rules published with source |
+| Staking and protocol participation reserve | 10,000,000 RAB | Genesis reserve, separate from block-reward issuance. It must remain traceable at disclosed genesis address(es) or a publicly verifiable mechanism. Its custody, staking/participation eligibility, release destinations, authorization, and spending limits must be frozen before mainnet. It is not the source of the 1.20/0.60/0.30/0.15 RAB rewards and must never be counted again as consensus issuance. |
 | Liquidity | 2,000,000 RAB | Dedicated on-chain vault or disclosed address; release conditions, authorized destinations, liquidity transactions, LP-token custody, and any lock disclosed |
 | Rabbit Club/community | 1,000,000 RAB | Dedicated community treasury or distribution vault; purpose, authority, voting/approval process if any, and every transfer visible |
 | Operational costs | 400,000 RAB | Dedicated operations treasury, separate from all other allocations; signer policy and categorized periodic reporting |
@@ -334,7 +337,7 @@ The planned sequence is:
 
 | Stage | Canonical action | Public evidence |
 |---|---|---|
-| Block 0 | Create the 10,000,000 RAB protocol allocation and fund the five precomputed contract addresses totaling 5,000,000 RAB | Genesis file, hashes, balance proof, address-derivation manifest |
+| Block 0 | Create the 10,000,000 RAB staking/participation reserve and fund the five precomputed contract addresses totaling 5,000,000 RAB | Genesis file, disclosed reserve address/mechanism, hashes, balance proofs, address-derivation manifest |
 | First mainnet blocks | Deploy the exact liquidity, community, operations, testnet-reward, and creator/developer contracts | Transactions, receipts, creation and runtime bytecode, verified source |
 | Verification gate | Compare predicted and actual addresses, code hashes, balances, roles, limits, and timelocks | Reproducible verification report and contract registry |
 | Activation | Permit each contract's intended use only after its verification passes | Public status, activation transaction if applicable, explorer links |
@@ -809,6 +812,7 @@ The project should be judged by reproducible code and observable network behavio
 
 | Version | Date | Description |
 |---|---|---|
+| 0.9-r4 | 30 August 2026 | Repository-wide consistency correction: regenerated allocation PNG, synchronized machine-readable version, separated the 10,000,000 RAB genesis reserve from consensus issuance, and clarified activation-delay observability |
 | 0.9-r3 | 30 August 2026 | Monetary-policy reconciliation: 15,000,000 RAB genesis allocation, active era schedule, permanent 0.15 RAB tail emission, immediate mining rewards, and committee zero-recipient behavior |
 | 0.9 | 29 August 2026 | Pre-testnet technical edition; LCQ architecture, 15,000,000 RAB genesis allocation, 100,000 RAB testnet reserve sourced from the former operations allocation, contract/treasury transparency framework, validation evidence, risks, launch gates, participation guide, FAQ, and glossary |
 

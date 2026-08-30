@@ -1,5 +1,5 @@
 {
-  "document_version": "0.9",
+  "document_version": "0.9-r4",
   "status_meaning": "reserved is not live; active requires DNS, TLS, chain identity, and health verification",
   "shared": {
     "website": {"url": "https://rabbitchain.org/", "status": "active"},
