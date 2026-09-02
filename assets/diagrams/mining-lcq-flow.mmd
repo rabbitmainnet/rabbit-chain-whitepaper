@@ -1,8 +1,8 @@
 flowchart TD
     A[Wallet and synchronized client] --> B[Canonical work context]
     B --> C[RandomX proof search]
-    C --> D[Work V1 ticket validation]
-    D --> E[One canonical WorkSeat per wallet per epoch]
+    C --> D[Work V2 ticket validation]
+    D --> E[One persistent equal seat per wallet]
     X[Same-wallet duplicate work] -. ignored .-> E
     E --> F[Deterministic LCQ queue]
     F --> G[Scheduled producer signs canonical block]

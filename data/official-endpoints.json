@@ -1,27 +1,69 @@
 {
-  "document_version": "0.9-r4",
+  "document_version": "1.0",
   "status_meaning": "reserved is not live; active requires DNS, TLS, chain identity, and health verification",
   "shared": {
-    "website": {"url": "https://rabbitchain.org/", "status": "active"},
-    "documentation": {"url": "https://docs.rabbitchain.org/", "status": "reserved"},
-    "status": {"url": "https://status.rabbitchain.org/", "status": "reserved"},
-    "downloads": {"url": "https://rabbitchain.org/downloads", "status": "planned"},
-    "github": {"url": "https://github.com/rabbitmainnet", "status": "active"}
+    "website": {
+      "url": "https://rabbitchain.org/",
+      "status": "active"
+    },
+    "documentation": {
+      "url": "https://docs.rabbitchain.org/",
+      "status": "reserved"
+    },
+    "status": {
+      "url": "https://status.rabbitchain.org/",
+      "status": "reserved"
+    },
+    "downloads": {
+      "url": "https://rabbitchain.org/releases",
+      "status": "active"
+    },
+    "github": {
+      "url": "https://github.com/rabbitmainnet",
+      "status": "active"
+    }
   },
   "testnet": {
     "chain_id": 9280,
-    "rpc_http": {"url": "https://rpc-testnet.rabbitchain.org/", "status": "reserved"},
-    "rpc_websocket": {"url": "wss://rpc-testnet.rabbitchain.org/ws", "status": "reserved"},
-    "explorer": {"url": "https://explorer-testnet.rabbitchain.org/", "status": "reserved"},
-    "faucet": {"url": "https://faucet-testnet.rabbitchain.org/", "status": "reserved"},
-    "genesis_hash": null,
-    "bootnodes": []
+    "rpc_http": {
+      "url": "https://rpc-testnet.rabbitchain.org/",
+      "status": "active"
+    },
+    "rpc_websocket": {
+      "url": "wss://rpc-testnet.rabbitchain.org/ws",
+      "status": "active"
+    },
+    "explorer": {
+      "url": "https://explorer-testnet.rabbitchain.org/",
+      "status": "active"
+    },
+    "faucet": {
+      "url": "https://faucet-testnet.rabbitchain.org/",
+      "status": "reserved"
+    },
+    "genesis_hash": "0x9b71d7f2922fdf8383a4a12be5594e25938625195e0d84c05c3bd71b7bcf93f7",
+    "bootnodes": [
+      "enode://867431475238a2da10b62aeb2197d00baa4880f66b14ca97ec99ef51d13143791cf89893a8f41e1fcf1bd0e0f1ef86081d0c28b268953f723e6dd3c18efc8a39@137.184.105.140:30303",
+      "enode://b345298a2e97c249e2e7987f7a7b9289d7f0f6bc02b06bba8d7b6c478ae62a293952c8187fb67c30d2ecf60332080b79a8ab3584d4d87d34bf549e6122208b07@162.243.49.184:30303"
+    ],
+    "genesis_file_sha256": "e2e5494542e37689cb6e385456d6df239e478c1d12e9c3a1cc270e69c6b51686",
+    "release_tag": "rabbit-core-testnet-v2",
+    "release_commit": "302b8b27a16e943a216a7403b017e2397ea15664"
   },
   "mainnet": {
     "chain_id": 928,
-    "rpc_http": {"url": "https://rpc.rabbitchain.org/", "status": "reserved"},
-    "rpc_websocket": {"url": "wss://rpc.rabbitchain.org/ws", "status": "reserved"},
-    "explorer": {"url": "https://explorer.rabbitchain.org/", "status": "reserved"},
+    "rpc_http": {
+      "url": "https://rpc.rabbitchain.org/",
+      "status": "reserved"
+    },
+    "rpc_websocket": {
+      "url": "wss://rpc.rabbitchain.org/ws",
+      "status": "reserved"
+    },
+    "explorer": {
+      "url": "https://explorer.rabbitchain.org/",
+      "status": "reserved"
+    },
     "faucet": null,
     "genesis_hash": null,
     "bootnodes": []

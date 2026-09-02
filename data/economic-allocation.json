@@ -1,12 +1,17 @@
 {
-  "document_version": "0.9-r4",
+  "document_version": "1.0",
   "status": "pre-mainnet",
   "native_asset": "RAB",
   "genesis_allocation_rab": 15000000,
   "finite_maximum_supply": false,
   "reward_schedule": {
     "era_length_blocks": 8409600,
-    "base_reward_rab": [1.2, 0.6, 0.3, 0.15],
+    "base_reward_rab": [
+      1.2,
+      0.6,
+      0.3,
+      0.15
+    ],
     "tail_reward_rab": 0.15,
     "tail_reward_continues": true,
     "first_paid_block": 1,

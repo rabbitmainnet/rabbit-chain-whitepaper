@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.0 - Public Testnet V2
+
+- Published the verified Testnet V2 network identity, endpoints, bootnodes, genesis and release commit.
+- Replaced Work V1 and epoch-scoped seats with Work V2 one-time admission and persistent equal seats.
+- Documented blocks 128/256, miner states, 70/30 rewards and two-minute permissionless recovery.
+- Aligned participation, validation evidence, security limitations, FAQ and glossary with the released implementation.
+
 ## v0.9-r4 - Repository-wide consistency correction
 
 - Regenerated the allocation PNG so it no longer claims a fixed or maximum 15,000,000 RAB supply.

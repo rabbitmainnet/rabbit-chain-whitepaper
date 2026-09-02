@@ -6,4 +6,4 @@ flowchart TD
     E --> F[Check next permitted producer]
     F --> B
     F -->|No participant remains| G[Chain waits]
-    G -->|Participation returns| H[Resume preserved history]
+    G -->|Two-minute halt: recovery admission| H[Resume preserved history]

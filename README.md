@@ -1,42 +1,42 @@
 # Rabbit Chain
 
-## A Permissionless EVM Layer 1 with Live Consensus Queue
+## Permissionless EVM Layer 1 with Live Consensus Queue
 
-**Technical Whitepaper - Pre-Testnet Edition v0.9-r4**
-**30 August 2026**
+**Technical Whitepaper - Public Testnet V2 Edition v1.0**
+**2 September 2026**
 
-> One eligible wallet. One fair chance.
+> One wallet. One persistent equal consensus seat.
 
 ---
 
 ## Document status
 
-This document describes the intended architecture and the implementation state of Rabbit Chain before the public testnet. It is a technical disclosure, not an offer of securities, a promise of profit, or a guarantee of network performance. Where this paper and executable network rules differ, the versioned source code, genesis file, and canonical chain state are authoritative.
-
-| Item | Status |
+| Item | Public status |
 |---|---|
-| Public testnet | Pre-launch; infrastructure not yet activated |
-| Testnet chain ID | 9280 |
-| Planned mainnet chain ID | 928 |
-| Native asset | RAB |
-| Execution | Ethereum Virtual Machine compatible |
-| Consensus | LCQ — Live Consensus Queue |
-| Work proof | RandomX-backed Work V1 |
-| Canonical source branch | `testnet-release-v1` |
-| Validated source commit | `e9875409dcf27e497812965296cece5d2e0f267a` |
-| Evidence checkpoint | `b9967ca73cf5fe30b854d10ae55a48f2127efb2c` |
+| Rabbit Testnet V2 | Live |
+| Chain ID / Network ID | `9280` / `9280` |
+| Native test asset | `tRAB` |
+| Consensus | LCQ with permissionless Work V2 admission |
+| Execution | EVM / EIP-1559 |
+| Release | `rabbit-core-testnet-v2` |
+| Source commit | `302b8b27a16e943a216a7403b017e2397ea15664` |
+| Genesis file SHA-256 | `e2e5494542e37689cb6e385456d6df239e478c1d12e9c3a1cc270e69c6b51686` |
+| Canonical block-0 hash | `0x9b71d7f2922fdf8383a4a12be5594e25938625195e0d84c05c3bd71b7bcf93f7` |
+| Public RPC | <https://rpc-testnet.rabbitchain.org> |
+| Explorer | <https://explorer-testnet.rabbitchain.org> |
+| Mainnet | Not live; planned chain ID `928` |
 
----
+Testnet software and tRAB are experimental. Testnet assets have no promised monetary value. Mainnet parameters, contracts, custody mechanisms and dates are not final unless published through a separate signed release.
 
 ## Abstract
 
 Rabbit Chain is a permissionless, EVM-compatible Layer 1 network designed around a simple fairness objective: multiplying mining processes must not multiply a wallet's opportunity to obtain a canonical production seat. The protocol combines computational work, an on-chain participant registry, deterministic ordering, liveness rules, and committee participation in a mechanism called **Live Consensus Queue (LCQ)**.
 
-Traditional proof-of-work systems tend to assign block-production probability in proportion to accumulated hash power. Rabbit Chain instead uses work as an admission and liveness signal for a time-bounded **WorkSeat**. Eligible identities are then ordered deterministically for block production. A participant may run redundant software and hardware, but duplicate work associated with the same wallet must not create duplicate canonical seats in the same epoch.
+Traditional proof-of-work systems tend to assign block-production probability in proportion to accumulated hash power. Rabbit Chain instead uses RandomX work for one-time admission into a **persistent equal seat**. Admitted identities are then ordered deterministically for block production. A participant may run redundant software and hardware, but duplicate work associated with the same wallet cannot create duplicate canonical seats.
 
 The network retains the Ethereum execution model so existing wallets, Solidity contracts, developer tooling, transaction formats, and JSON-RPC conventions can be used with limited adaptation. Consensus, however, is Rabbit-specific. LCQ separates work discovery from scheduled production and distributes protocol rewards between the producer and a selected committee.
 
-Pre-launch gates have exercised fresh multi-node operation, restart behavior, Work V1 transport, canonical ticket handling, and the one-wallet/one-seat invariant. In the final extraordinary live gate, three independent miner processes using the same wallet produced exactly one canonical WorkSeat, with zero duplicate seat, followed by a successful re-audit after node restart.
+Release gates exercised fresh multi-node operation, restart behavior, Work V2 transport, canonical ticket handling and persistent-seat enforcement. The final live lab admitted three independent wallets, activated exactly three persistent equal seats and observed canonical block production from all three participants.
 
 ## 1. Motivation
 
@@ -47,12 +47,12 @@ Rabbit Chain addresses a narrower and measurable problem: **process multiplicati
 The design follows five principles:
 
 1. **Permissionless entry.** No manual approval, private validator list, or administrator transaction should be required to begin participating.
-2. **Wallet-bounded opportunity.** One eligible wallet receives at most one canonical WorkSeat per epoch.
+2. **Wallet-bounded opportunity.** One non-zero wallet owns at most one persistent equal seat.
 3. **Deterministic verification.** Honest nodes given the same canonical history must derive the same registry, eligible set, and queue.
 4. **Recoverable liveness.** Temporary inactivity, node failure, or loss of producers should not require a trusted operator to rewrite the chain.
 5. **EVM utility.** Consensus innovation should coexist with established smart-contract tooling and account semantics.
 
-These goals do not eliminate every form of concentration. A person may control multiple wallets, and no permissionless protocol can prove unique human identity without additional assumptions. LCQ therefore enforces a precise technical invariant — one seat per eligible wallet per epoch — and combines it with bond, activity, work, delay, and penalty rules that raise the cost of mass identity creation.
+These goals do not eliminate every form of concentration. A person may control multiple wallets, and no permissionless protocol can prove unique human identity without additional assumptions. LCQ therefore enforces the precise technical invariant of one persistent equal seat per non-zero wallet; every additional wallet must independently complete public RandomX admission.
 
 ## 2. System overview
 
@@ -60,21 +60,21 @@ Rabbit Chain has four cooperating layers:
 
 - **Execution layer:** EVM state transition, accounts, transactions, receipts, logs, gas, and smart contracts.
 - **Consensus layer:** LCQ validation, registry snapshots, queue resolution, producer signatures, timeout/fallback handling, and committee selection.
-- **Work layer:** RandomX-backed proof generation and peer-to-peer Work V1 ticket transport.
+- **Work layer:** RandomX-backed proof generation and peer-to-peer Work V2 ticket transport.
 - **Network layer:** peer discovery, transaction and block propagation, consensus messages, RPC access, and independently operated infrastructure.
 
 The intended user path is deliberately short:
 
 > Download → run → use a wallet → mine.
 
-Registration and activation are protocol-driven. The client resolves the local participant, submits valid work, observes activation rules, and joins the deterministic queue when eligible.
+Admission and activation are protocol-driven. The client resolves the local wallet, submits valid work, waits for canonical activation, and joins the persistent deterministic queue without administrator approval.
 
 ```mermaid
 flowchart TD
     A[Wallet and synchronized client] --> B[Canonical work context]
     B --> C[RandomX proof search]
-    C --> D[Work V1 ticket validation]
-    D --> E[One canonical WorkSeat per wallet per epoch]
+    C --> D[Work V2 ticket validation]
+    D --> E[One persistent equal seat per wallet]
     X[Same-wallet duplicate work] -. ignored .-> E
     E --> F[Deterministic LCQ queue]
     F --> G[Scheduled producer signs canonical block]
@@ -90,110 +90,65 @@ flowchart TD
 | What is LCQ? | A mechanism that converts valid work into a wallet-bounded position in a deterministic live production queue |
 | What makes it different? | Running more miner processes with the same wallet must not create more canonical seats for that wallet in the same epoch |
 | Is it ordinary PoW? | No. RandomX work qualifies participation; the LCQ queue schedules block production |
-| Is it PoS? | No. Bonding supports eligibility and anti-abuse rules, but stake weight alone does not select the next producer |
-| Can anyone join? | Yes, subject to the same public protocol rules, work, bond, activation, activity, and client requirements |
+| Is it PoS? | No. Stake weight does not select the next producer |
+| Can anyone join? | Yes. Any compatible non-zero wallet may perform the same public Work V2 admission |
 | Can Ethereum tools be used? | The goal is compatibility with common EVM wallets, Solidity, transactions, contracts, logs, and JSON-RPC tooling |
-| What is the native asset? | RAB, used for gas, rewards, bonding, and protocol accounting |
-| Is the public testnet live? | Not at this edition's publication checkpoint |
+| What is the native asset? | RAB on mainnet and valueless tRAB on Testnet V2, used for gas, rewards and protocol accounting |
+| Is the public testnet live? | Yes. Testnet V2 uses chain ID 9280 |
 
 ### 2.2 LCQ compared with common models
 
 | Property | Conventional PoW | Conventional PoS | Rabbit LCQ |
 |---|---|---|---|
 | Primary admission signal | Computational work | Locked stake | Valid work plus protocol eligibility |
-| Typical selection weight | Hash power | Stake weight | One canonical queue seat per eligible wallet per epoch |
+| Typical selection weight | Hash power | Stake weight | One persistent equal seat per admitted wallet |
 | Block producer | Hash-race winner | Stake-selected validator | Deterministically scheduled eligible wallet |
 | Duplicate processes on one wallet | Usually add hash rate | Usually operational redundancy | May help find the first proof but must not add canonical seats |
-| Capital still matters? | Hardware and energy matter | Stake matters directly | Compute, bond, uptime, and multiple funded wallets can still matter |
+| Capital still matters? | Hardware and energy matter | Stake matters directly | Admission hardware, uptime and multiple wallets can still matter, but one wallet cannot multiply its seat weight |
 | Unique-human guarantee | No | No | No |
 
 This comparison is conceptual. Individual PoW and PoS networks differ, and the Rabbit implementation is defined by its released source and configuration.
 
-## 3. Live Consensus Queue
+## 3. Work V2 and Live Consensus Queue
 
-### 3.1 Core idea
+### 3.1 Admission is separate from continuing influence
 
-LCQ converts valid computational work into a bounded right to participate in a deterministic production schedule. It is not conventional hash-race proof of work: the first valid hash does not automatically grant indefinite control over successive blocks. It is also not conventional proof of stake: capital weight alone does not determine the next producer.
+Rabbit Work V2 uses RandomX for permissionless, one-time admission. A wallet that obtains a canonical admission waits for activation and then owns one persistent equal consensus seat. RandomX stops automatically for that identity after activation. Faster CPUs may find the initial proof sooner, but cannot give an admitted wallet extra seats or recurring selection weight.
 
-The canonical chain maintains a participant registry. At each relevant height or epoch boundary, all honest nodes derive an eligible set from the same historical state. The set is ordered using canonical chain entropy, including the parent block context, and each eligible wallet occupies no more than one position.
+This invariant is wallet-bounded, not person-bounded. LCQ does not prove human identity. A person may operate multiple wallets, but every additional non-zero wallet must independently complete the same public admission process.
 
-Conceptually:
+### 3.2 Fresh-network lifecycle
 
-\[
-E_h = \{p \in R_h : \operatorname{Eligible}(p,h)=\text{true}\}
-\]
+| Canonical height | Work V2 state |
+|---|---|
+| Blocks 1-127 | Bootstrap history; miners wait safely |
+| Block 128 | First admission epoch opens and the 1 GiB RandomX dataset is prepared |
+| Blocks 129-255 | Valid admissions may become canonical and display `ADMISSION_PENDING` |
+| Block 256 | First canonical admissions activate as persistent equal seats |
+| After activation | `ACTIVE_SEAT`; RandomX ends while LCQ participation continues |
 
-\[
-Q_h = \operatorname{Order}(E_h,\ H_{h-1},\ e_h)
-\]
+At the 10-second target, blocks 128 and 256 are approximately 21 and 43 minutes after genesis. Canonical height, not a local timer, controls activation. A paused or slower network takes longer.
 
-where \(R_h\) is the registry snapshot, \(H_{h-1}\) is canonical parent context, \(e_h\) is the epoch, and \(Q_h\) is the deterministic queue. The executable client defines the exact encoding, hashing, and tie-breaking rules.
+### 3.3 Miner messages
 
-### 3.2 Participant eligibility
+- `no commit window` means the miner is waiting safely for a valid canonical admission window.
+- `Preparing the Rabbit RandomX 1 GiB dataset` means epoch initialization is in progress.
+- `Mining Work V2 admission` reports attempts and local admission hash rate.
+- `ADMISSION_PENDING state=accepted_by_local_relay` means local acceptance exists but canonical confirmation is pending.
+- `ADMISSION_PENDING state=canonical_waiting_for_activation` means the proof is canonical; duplicate mining is unnecessary.
+- `ACTIVE_SEAT` means the wallet owns one persistent equal seat. A later `committed=false` is expected because activation consumed the temporary commitment.
 
-A participant is eligible only when all active protocol checks pass. The implemented checks include a non-zero address, an acceptable jail state, a sufficient bond according to network parameters, and a valid recent activity record. Bootstrap treatment at the first block is explicit so a new network can begin without relying on pre-existing heartbeats.
+### 3.4 Canonical enforcement
 
-Eligibility is evaluated from historical canonical state, not from an unverified local preference. A node cannot make a wallet eligible merely by configuring it locally.
+The canonical snapshot rejects a participant that already owns a persistent seat. Multiple processes, restarts, faster CPUs or repeated proofs for the same wallet cannot multiply that wallet's consensus weight. Nodes independently validate the proof, signature, canonical context and seat state.
 
-### 3.3 Activation delay
+The private key and password remain local. Only the participant address, nonce, proof hash and signature are relayed.
 
-Newly observed participants do not receive immediate influence over the current queue. An activation delay separates canonical registration from eligibility. If a participant is registered at block `r` and the released network parameter is `ActivationDelay = d`, the earliest activation block is derived as `r + d`, subject to every other eligibility check still passing at that block. Registration therefore does not guarantee a seat or a block; after activation the wallet must still provide valid work, satisfy bond/activity/jail rules, obtain at most one canonical WorkSeat in the epoch, and wait for its deterministic queue position.
+## 4. RandomX admission
 
-The pre-testnet paper does not invent `d`. The exact public-testnet value must be copied from the finalized genesis/configuration into the release guide and parameters manifest before block 1. A release is incomplete if users cannot determine `registration block`, `ActivationDelay`, and `earliest activation block` from public data.
+RandomX is a CPU-oriented proof algorithm used for Work V2 admission and recovery, not for recurring proportional block-production weight. Testnet V2 uses a 1 GiB dataset and derives each challenge from canonical epoch context. A valid proof is signed by the participant wallet and independently verified by receiving nodes.
 
-### 3.4 WorkSeat lifecycle
-
-A WorkSeat is associated with a participant wallet and epoch. Its lifecycle is:
-
-1. The client obtains the canonical work context.
-2. A miner computes RandomX proofs against that context.
-3. A valid ticket is submitted over the Work V1 transport.
-4. Nodes validate the proof, context, participant status, epoch, and duplication rules.
-5. An accepted ticket becomes eligible for canonical inclusion.
-6. Canonical history grants at most one seat to the participant for that epoch.
-7. The queue uses the canonical eligible-seat set for production ordering.
-
-Tickets that are stale, malformed, invalid, ineligible, or duplicate must not create additional seats.
-
-### 3.5 One wallet, one seat
-
-For participant \(p\) and epoch \(e\), the intended invariant is:
-
-\[
-\operatorname{CanonicalSeats}(p,e) \leq 1
-\]
-
-This invariant applies even when multiple processes, machines, or submissions use the same wallet. Redundant mining can improve availability or the chance that the wallet finds its first valid proof, but it cannot create multiple canonical queue identities for that wallet during the same epoch.
-
-This is wallet fairness, not proof of unique-personhood. The distinction is essential: the protocol does not claim that one wallet always equals one human.
-
-### 3.6 A complete miner example
-
-Consider Alice, who controls wallet `A`:
-
-1. Alice installs the official or reproducibly built Rabbit software and verifies its hash.
-2. Her node connects to peers and independently synchronizes the canonical chain.
-3. The client resolves wallet `A` as the local participant and observes the current registry, epoch, work context, bond, activity, and activation rules.
-4. If `A` is new, its canonical registration block is recorded. The client displays or derives the earliest activation block from the released `ActivationDelay`; Alice waits while the chain advances and keeps every other eligibility condition valid.
-5. Alice starts one miner process. It searches for a valid RandomX proof bound to the current challenge and dataset anchors.
-6. After finding a proof, the client submits a Work V1 ticket. Nodes independently validate the proof and participant state.
-7. Once the ticket is canonically recognized, wallet `A` may hold one WorkSeat for that epoch.
-8. Every honest node derives the same queue from canonical history. When `A` reaches the permitted production position, Alice's client builds and signs a block.
-9. Other nodes verify the expected producer, seal, transactions, EVM result, gas, rewards, and all LCQ rules before accepting it.
-10. If Alice opens two additional miners with wallet `A`, they may search redundantly, but wallet `A` must still receive no more than one canonical seat in that epoch.
-11. If Alice is offline during her turn, timeout and fallback rules allow the next permitted producer to advance liveness.
-
-Alice never asks an administrator to approve her wallet. She also cannot make herself eligible merely by editing a local configuration: canonical nodes recompute every relevant rule.
-
-## 4. Work V1 and RandomX
-
-Rabbit Chain uses a RandomX-backed work path because RandomX is designed for general-purpose CPUs and uses randomized execution and memory-hard techniques to reduce the relative advantage of specialized hardware. Rabbit integrates this proof into LCQ ticket admission rather than adopting a conventional highest-hashpower-wins block race.
-
-The work context binds a proof to canonical network state. It includes an epoch, a challenge anchor, a dataset anchor, and canonical runtime difficulty. A submitted proof is useful only for the context for which it was produced. Context binding helps prevent replay across epochs, networks, or unrelated chain histories.
-
-Work V1 is carried by a dedicated peer-to-peer transport. Production activation is guarded by network identity and genesis markers so a laboratory transport configuration cannot silently activate on an unintended network.
-
-The pre-launch validated difficulty was `100000` (`0x186a0`). This value is a network parameter, not a permanent promise; the public genesis and versioned client are authoritative.
+The released genesis, source and client are authoritative for challenge construction, difficulty and validation. Production activation is guarded by network identity and genesis markers so a laboratory configuration cannot silently activate on another chain.
 
 ## 5. Block production and liveness
 
@@ -211,23 +166,9 @@ If the scheduled producer does not publish a valid block within its slot, fallba
 
 ### 5.4 Network interruption and recovery
 
-If participation falls to zero, the chain may stop rather than fabricate work or appoint a trusted emergency producer. When a valid participant returns, recovery rules derive from preserved canonical state and resume after the last accepted block. Nodes must not delete history or reset to genesis to restore liveness.
+If every producer goes offline, the chain pauses at its last valid canonical block. It does not reset or erase blocks, balances, transactions or persistent seats. After a two-minute canonical halt, permissionless recovery admission opens. Any compatible non-zero wallet may find and submit a valid RandomX recovery proof. The recovery identity advances the existing chain until normal persistent-seat LCQ operation resumes.
 
-This recovery model has a trade-off: safety remains tied to verifiable history, but time to resume depends on valid work, participant eligibility, and propagation.
-
-```mermaid
-flowchart TD
-    A[Canonical LCQ queue] --> B[Expected producer]
-    B --> C{Valid block in slot?}
-    C -->|Yes| D[Verify block and accept]
-    C -->|No| E[Bounded fallback window]
-    E --> F[Check next permitted producer]
-    F --> B
-    F -->|No participant remains| G[Chain waits]
-    G -->|Participation returns| H[Resume preserved history]
-```
-
-*Figure 2. A missed producer advances through public fallback rules. If no eligible participant remains, the chain waits and later resumes from preserved canonical history.*
+Recovery still requires verifiable work and propagation. Deleting history or appointing a trusted emergency producer is not part of the protocol.
 
 ## 6. Committee and rewards
 
@@ -238,7 +179,7 @@ Each canonical block divides the configured protocol reward between the producer
 | Block producer | 70% |
 | Committee | 30% |
 
-The committee is derived deterministically from canonical participant state and bounded by configured minimum and maximum sizes. Reference pre-launch parameters use a minimum of 32 and maximum of 128 committee members, with a committee ratio of 3000 basis points. Small bootstrap or laboratory networks may operate under explicit special-case parameters; the released genesis controls the public network.
+The committee is derived deterministically from canonical persistent-seat state. The released genesis and client control the public network; laboratory parameters are not authoritative for Testnet V2.
 
 Committee distribution is intended to spread rewards beyond the single scheduled producer and reward active consensus participation. When a valid committee is available, 70% goes to the block producer and 30% is divided among the committee under the client implementation's deterministic rounding rules. When no valid committee recipient exists, the producer receives 100% of that block's configured reward; no committee share is left unassigned.
 
@@ -259,7 +200,7 @@ The 0.15 RAB reward continues permanently unless a future consensus change is ad
 
 ## 7. RAB economic model
 
-RAB is the native asset used for gas, protocol rewards, bonding, and network-level economic accounting. The genesis allocation is **15,000,000 RAB**. This is the complete block-0 allocation, not a maximum supply: consensus block rewards add new RAB according to Section 6.1, and the permanent 0.15 RAB tail reward means total supply is not finitely capped. The testnet participation reserve is part of the 15,000,000 RAB genesis allocation; it is not additional genesis allocation or a separate mint.
+RAB is the planned mainnet native asset used for gas, protocol rewards and network-level economic accounting. The genesis allocation is **15,000,000 RAB**. This is the complete block-0 allocation, not a maximum supply: consensus block rewards add new RAB according to Section 6.1, and the permanent 0.15 RAB tail reward means total supply is not finitely capped. The testnet participation reserve is part of the 15,000,000 RAB genesis allocation; it is not additional genesis allocation or a separate mint.
 
 | Allocation | RAB | Share |
 |---|---:|---:|
@@ -342,7 +283,7 @@ The planned sequence is:
 | Verification gate | Compare predicted and actual addresses, code hashes, balances, roles, limits, and timelocks | Reproducible verification report and contract registry |
 | Activation | Permit each contract's intended use only after its verification passes | Public status, activation transaction if applicable, explorer links |
 
-Exact deployment block numbers are not invented in this pre-testnet edition. They will be frozen in the signed mainnet deployment manifest after the full testnet rehearsal and before mainnet genesis is released.
+Exact deployment block numbers are intentionally not claimed for mainnet. They must be frozen in a signed mainnet deployment manifest after public testnet review and before mainnet genesis is released.
 
 ### 7.4 Creator and developer vesting
 
@@ -422,7 +363,7 @@ The public testnet is intended to validate real activity from blocks 1 through 1
 | Valid bug hunters | 5,000 RAB |
 | **Total reserved** | **100,000 RAB** |
 
-Eligibility is based on verifiable testnet activity, such as mining, transactions, deployments, use, and accepted bug reports. Likes, follows, reposts, or other social engagement do not determine rewards. Full criteria, wallet-verification procedures, exclusions, anti-abuse rules, and dispute handling must be published before block 1.
+Eligibility is intended to use verifiable testnet activity, such as mining, transactions, deployments, use, and accepted bug reports. Likes, follows, reposts, or other social engagement do not determine rewards. Final criteria, wallet-verification procedures, exclusions, anti-abuse rules and dispute handling must be published before any allocation or claim.
 
 Planned distribution occurs six months after official mainnet liquidity begins, subject to the final published program rules and legal review. Testnet assets themselves have no promised monetary value.
 
@@ -488,23 +429,26 @@ Bootnodes help peers find one another but do not grant consensus authority. An R
 
 Official launch infrastructure must use fresh datadirs, chaindata, node keys, databases, and runtime secrets. Laboratory state is never promoted into the public network. Only audited source, validated binaries, deliberately finalized genesis/configuration, and reproducible deployment procedures may be reused.
 
-### 10.1 Official domains and stable endpoint plan
+### 10.1 Official Testnet V2 endpoints
 
-The following names are reserved as the stable official interface. A reserved endpoint is not evidence that a service is already live. Before activation, the website and repository must mark it **inactive**; after activation, DNS, TLS, service identity, chain ID, genesis hash, and health checks must all agree.
+| Purpose | Public Testnet V2 endpoint | Status |
+|---|---|---|
+| Website | `https://rabbitchain.org/` | Active |
+| HTTP RPC | `https://rpc-testnet.rabbitchain.org/` | Active |
+| WebSocket RPC | `wss://rpc-testnet.rabbitchain.org/ws` | Active |
+| Explorer | `https://explorer-testnet.rabbitchain.org/` | Active |
+| Source and releases | `https://github.com/rabbitmainnet/rabbit-geth` | Active |
+| Whitepaper | `https://github.com/rabbitmainnet/rabbit-chain-whitepaper` | Active |
+| Faucet | `https://faucet-testnet.rabbitchain.org/` | Not active |
 
-| Purpose | Testnet | Mainnet | Pre-launch status |
-|---|---|---|---|
-| Website | `https://rabbitchain.org/` | `https://rabbitchain.org/` | Active project website |
-| Documentation | `https://docs.rabbitchain.org/` | `https://docs.rabbitchain.org/` | Reserved until documentation deployment |
-| HTTP RPC | `https://rpc-testnet.rabbitchain.org/` | `https://rpc.rabbitchain.org/` | Reserved; must not be presented as active before health verification |
-| WebSocket RPC | `wss://rpc-testnet.rabbitchain.org/ws` | `wss://rpc.rabbitchain.org/ws` | Reserved; must not be presented as active before health verification |
-| Explorer | `https://explorer-testnet.rabbitchain.org/` | `https://explorer.rabbitchain.org/` | Reserved until indexer verification |
-| Faucet | `https://faucet-testnet.rabbitchain.org/` | Not applicable | Reserved; testnet assets only |
-| Network status | `https://status.rabbitchain.org/` | `https://status.rabbitchain.org/` | Reserved until monitoring deployment |
-| Downloads | `https://rabbitchain.org/downloads` | `https://rabbitchain.org/downloads` | Planned permanent release page |
-| Source organization | `https://github.com/rabbitmainnet` | `https://github.com/rabbitmainnet` | Active official organization |
+Official bootnodes:
 
-The mainnet faucet cell is intentionally “Not applicable”: the project will not promise free mainnet RAB through a faucet. Community-operated endpoints may use other domains, but they must not be represented as official Rabbit Chain infrastructure.
+```text
+enode://867431475238a2da10b62aeb2197d00baa4880f66b14ca97ec99ef51d13143791cf89893a8f41e1fcf1bd0e0f1ef86081d0c28b268953f723e6dd3c18efc8a39@137.184.105.140:30303
+enode://b345298a2e97c249e2e7987f7a7b9289d7f0f6bc02b06bba8d7b6c478ae62a293952c8187fb67c30d2ecf60332080b79a8ab3584d4d87d34bf549e6122208b07@162.243.49.184:30303
+```
+
+Bootnodes provide discovery only. They have no consensus or administrative authority, and community operators may publish additional bootnodes.
 
 ### 10.2 Launch identity file
 
@@ -537,7 +481,7 @@ Rabbit's validation rules are designed to protect:
 
 ### 11.2 Sybil resistance and limitations
 
-Wallet deduplication prevents process-level multiplication behind the same address. Bonding, work cost, activation delay, recent activity, and jailing increase the cost of operating many addresses. They do not make Sybil attacks impossible and do not prove civil identity.
+Canonical wallet deduplication prevents process-level multiplication behind the same address. Independent RandomX admission increases the cost of operating many addresses, but does not make Sybil attacks impossible and does not prove civil identity.
 
 An attacker with many funded, active wallets and sufficient compute may obtain many eligible seats. Security therefore depends on economic parameters, distribution of participants, client correctness, peer connectivity, key safety, and honest validation by independent nodes.
 
@@ -555,39 +499,15 @@ Before mainnet, Rabbit Chain remains experimental software. Testnet results redu
 
 ## 12. Validation evidence
 
-Rabbit's pre-server gate tested the production code path before public infrastructure was created. The extraordinary live-seat test resumed a preserved three-node chain, established full peer connectivity, launched three real RandomX miner processes using the same wallet, and waited for canonical inclusion.
+The Testnet V2 release passed regressions across LCQ, Ethereum networking, downloader, miner, parameters, Rabbit Miner, Rabbit Core and core execution. A persistent three-node live lab demonstrated full peer connectivity, permissionless admission from three wallets, exactly three persistent equal seats, block production by all three participants, persistence across restart, canonical 70/30 rewards, a real EIP-1559 transaction and recovery-state telemetry.
 
-Observed result:
-
-| Evidence | Result |
-|---|---|
-| Real miner processes | 3 |
-| Unique mining wallets | 1 |
-| Canonical WorkSeats for the wallet | 1 per epoch |
-| Duplicate wallet seat | 0 |
-| Canonical ticket | Block 504, epoch 3 |
-| Re-audit after node restart | PASS |
-| Genesis changed during gate | No |
-| Source changed during gate | No |
-| Public servers/mining started | No |
-
-Evidence file:
-
-`docs/audits/rabbit-testnet-extraordinary-live-seat-e9875409d.txt`
-
-SHA-256:
-
-`6bb8cf1e20e5428ec9206cc0a552071cf16463818ba2b25e09efa6d748534b64`
-
-The report was committed to the official `testnet-release-v1` branch at documentation checkpoint `b9967ca73cf5fe30b854d10ae55a48f2127efb2c`. Later documentation commits do not change the validated source commit used by the tested binaries.
-
-This evidence supports the tested invariant under the tested conditions. It is not a mathematical proof of all possible executions and should not be presented as an independent security audit.
+GitHub Actions built and verified Windows AMD64 and Linux AMD64 archives from commit `302b8b27a16e943a216a7403b017e2397ea15664`. Validation is evidence, not proof that defects are impossible; Testnet V2 remains experimental.
 
 ## 13. Governance and upgrades
 
 Rabbit Chain's consensus should not depend on an administrator contract or an undisclosed privileged key. Protocol evolution occurs through public source changes, reviewable releases, explicit activation rules, and community adoption of compatible clients.
 
-During the pre-testnet phase, the founding development team coordinates releases and infrastructure. This practical coordination is disclosed as a centralization risk. The long-term objective is to reduce dependency on official infrastructure by enabling independent nodes, miners, RPC operators, explorers, developers, and reviewers.
+During the initial public-testnet phase, the founding development team coordinates official releases and infrastructure. This practical coordination is a disclosed centralization risk. The protocol objective is to reduce dependency on official infrastructure through independent nodes, miners, RPC operators, explorers, developers and reviewers.
 
 Any consensus upgrade should publish:
 
@@ -600,56 +520,25 @@ Any consensus upgrade should publish:
 
 ## 14. Roadmap and launch gates
 
-The roadmap is gate-driven rather than date-driven.
+### Public Testnet V2 completed
 
-### Completed before infrastructure
+- Work V2 permissionless admission and persistent-seat regressions;
+- fresh three-node network, blocks 128/256 activation and multi-producer operation;
+- producer/committee 70/30 economic audit and real EIP-1559 transaction;
+- reproducible Windows and Linux release archives;
+- public RPC, archive node, explorer, bootnodes and frozen genesis identity;
+- complete mining, wallet-backup and recovery documentation.
 
-- production Work V1 activation gates;
-- fresh multi-node consensus and restart exercises;
-- reward and canonical-state checks;
-- live same-wallet multi-process seat deduplication;
-- evidence committed to the official repository.
+### Continuing testnet work
 
-### Required before public testnet block 1
-
-- freeze and publish testnet genesis and chain configuration;
-- reproducibly build and hash Windows, Linux, and macOS packages;
-- deploy fresh bootnodes, RPC/archive node, and explorer/indexer;
-- configure DNS, TLS, firewalls, rate limits, monitoring, and backups;
-- publish miner, node, developer, and wallet instructions;
-- publish testnet reward-program terms and risk disclosure;
-- complete a public-infrastructure dry run without opening mining;
-- announce an exact, verifiable start procedure.
+- real public miner and node diversity;
+- long-duration availability, recovery, partition and adversarial testing;
+- independent builds, audits, issue reports and infrastructure;
+- final publication of any testnet participation-program rules.
 
 ### Required before mainnet
 
-- incorporate public-testnet findings;
-- complete independent security review appropriate to the final scope;
-- verify the published issuance, era, tail-emission, immediate-reward, vesting, and fee policies against the final client and genesis;
-- finalize mainnet genesis with public hashes and review window;
-- publish and rehearse the deterministic contract-address and first-block deployment manifest;
-- deploy every allocation contract in the published first-block window and verify its address, runtime bytecode, balance, roles, and restrictions before activation;
-- prepare incident-response and responsible-disclosure processes;
-- launch entirely fresh mainnet infrastructure and state.
-
-### Mainnet publication substitution checklist
-
-This pre-testnet edition deliberately fixes the document structure before final mainnet values exist. The mainnet publication process must replace every field below and must fail if any placeholder remains:
-
-| Field to finalize | Required evidence |
-|---|---|
-| Mainnet genesis hash | Published genesis file, SHA-256, and canonical block-0 hash |
-| Final source/release commit | Signed tag, source archive, reproducible build record, and binary hashes |
-| Bootnodes | Complete enode/ENR records, regions, operators, and connectivity test |
-| RPC/explorer/status services | DNS, TLS certificate, health check, chain ID, genesis identity, and operator disclosure |
-| Allocation contracts | Precomputed address and derivation inputs before launch; genesis funding proof; then deployment block/transaction, runtime hash, roles, exact balance, and verification status |
-| Contract addresses | Deployment transaction, verified source, bytecode hash, constructor arguments, and security review |
-| Multisigs and timelocks | Signer addresses, threshold, relationships, delay, guarded functions, and replacement policy |
-| Vesting start reference | Objective liquidity activation transaction/event and resulting timestamp/block |
-| Testnet reward root | Full public allocation dataset, hash, reproducible root script, contract root, and claim proofs |
-| Legal and risk disclosures | Version, effective date, jurisdictional limitations, and immutable publication hash |
-
-The final release must run an automated placeholder scan for strings such as `TBD`, `TODO`, `PLACEHOLDER`, `{ADDRESS}`, zero addresses used as unknown values, example domains, and unresolved template variables. Passing that scan does not prove correctness, so human and on-chain verification remain required.
+Mainnet requires a separate frozen genesis, signed artifacts, independent review, final allocation custody, verified contracts, signer and timelock disclosures, legal/risk review, mainnet infrastructure and a reproducible launch manifest. Testnet V2 does not imply mainnet readiness.
 
 ## 15. Reproducibility and verification
 
@@ -665,137 +554,96 @@ A professional release must allow third parties to connect documents to executab
 
 Users should verify downloaded binaries against published hashes and obtain hashes through more than one official channel where possible.
 
-## 16. Parameters snapshot
+## 16. Testnet V2 parameters snapshot
 
-The following values describe the current pre-launch reference configuration. The finalized public-testnet genesis supersedes this table.
-
-| Parameter | Reference value |
+| Parameter | Released value |
 |---|---:|
-| Testnet chain ID | 9280 |
+| Testnet chain ID / network ID | 9280 / 9280 |
 | Planned mainnet chain ID | 928 |
 | Target block time | 10,000 ms |
-| Fallback slots | 5 |
-| Fallback window | 3,000 ms |
 | Epoch length | 128 blocks |
-| Activity window | 128 blocks |
-| Committee minimum | 32 |
-| Committee maximum | 128 |
-| Committee reward ratio | 3,000 bps |
-| Producer reward ratio | 7,000 bps |
+| First admission height | 128 |
+| First activation height | 256 |
+| Recovery halt threshold | 2 minutes |
+| Producer / committee reward | 70% / 30% |
+| Initial base reward | 1.20 RAB |
 | Reward era length | 8,409,600 blocks |
 | Reward schedule | 1.20 -> 0.60 -> 0.30 -> 0.15 RAB |
-| Tail emission | 0.15 RAB per block permanently |
-| Mining-reward availability | Immediate after canonical credit |
-| Work proof | RandomX / Work V1 |
-| Reference proof difficulty | 100,000 |
-| Producer seal length | 65 bytes |
+| Tail emission | 0.15 RAB per block |
+| Work proof | RandomX / Work V2 |
+| RandomX dataset base size | 1 GiB |
+| Seat rule | At most one persistent equal seat per non-zero wallet |
 
 ## 17. How to participate
 
-Rabbit Chain is intended to support several independent roles. One person may perform more than one role, but each role has different responsibilities.
+1. Open `https://rabbitchain.org/mining` and follow the official GitHub release link.
+2. Download the Windows AMD64 ZIP or Linux AMD64 tarball and verify its SHA-256.
+3. Run Rabbit Core, create a strong local password and back up the exact encrypted `UTC--...` keystore file it prints. Keep the password separately.
+4. Keep Rabbit Core open while its full node synchronizes and admission becomes available.
+5. Wait for `ADMISSION_PENDING`, then `ACTIVE_SEAT`. Do not delete the data directory or repeatedly mine duplicate admissions.
+6. After activation, keep the node online for LCQ consensus participation.
 
-| Role | What the participant does | What is required |
-|---|---|---|
-| User | Holds RAB, sends transactions, uses applications | EVM wallet, correct network configuration, RAB for gas |
-| Miner/participant | Produces valid work and may receive an LCQ queue seat | Rabbit client, participant wallet, CPU resources, bond/activity required by the released rules |
-| Node operator | Verifies and propagates blocks and transactions | Rabbit node, storage, bandwidth, uptime, secure configuration |
-| RPC operator | Gives wallets and applications remote node access | Hardened node, HTTPS/WSS, rate limits, monitoring, restricted administrative APIs |
-| Explorer operator | Indexes and presents public chain data | Indexer, database, archive-capable data source, web service |
-| Builder | Deploys contracts, applications, tooling, or integrations | Solidity/EVM knowledge, test RAB, RPC access, development tools |
-| Tester | Exercises wallets, transactions, contracts, mining, recovery, and UX | Test plan, reproducible reports, transaction hashes and logs |
-| Reviewer | Reviews source, builds, cryptography integration, economics, or documentation | Relevant expertise and precise, reproducible findings |
+| Operating system | Main Rabbit Core directory |
+|---|---|
+| Windows | `%APPDATA%\RabbitChain\TestnetV2` |
+| Linux | `${XDG_CONFIG_HOME:-$HOME/.config}/RabbitChain/TestnetV2` |
 
-Before the public testnet begins, users should rely only on links published through Rabbit Chain's official website and repository. They should verify the chain ID, genesis hash, software hash, RPC endpoint, explorer domain, and release commit. No one should share a seed phrase or private key with a website, administrator, support agent, miner, faucet, or RPC operator.
+Within that directory, the wallet is under `keystore/UTC--...`, chain data under `rabbit/chaindata`, and logs under `logs/rabbit-node.log`. The `.rabbit-session-password-*` file is temporary and is not a backup.
 
-### 17.1 First-day user flow
-
-1. Open the official release page from `rabbitchain.org` or the verified GitHub organization.
-2. Download the package for the correct operating system and verify its SHA-256 hash.
-3. Create a new testnet-only wallet or import a deliberately selected test wallet; never expose its private key.
-4. Add Rabbit Testnet using the published chain ID `9280`, official RPC, currency symbol, and explorer URL.
-5. Obtain valueless testnet RAB from the official faucet when available.
-6. Send a small transaction and confirm it independently in the wallet, RPC, and explorer.
-7. Builders may deploy a test contract; miners may follow the published node and mining guide.
-8. Save transaction hashes, block numbers, logs, software version, and steps when reporting a problem.
-
-The exact commands, ports, RPC URL, explorer URL, bootnodes, faucet URL, genesis hash, and release hashes are intentionally not frozen in this pre-launch whitepaper. They belong in versioned launch documentation because publishing placeholders as final values would create user risk.
+Never give a password, private key, seed phrase or keystore to a website, RPC, explorer, faucet, administrator or support agent.
 
 ## 18. Frequently asked questions
 
-### Is Rabbit Chain already public?
+### Is the public testnet live?
 
-Not at the v0.9 checkpoint. Consensus gates were completed locally before public servers or public mining were activated.
+Yes. This edition documents the fresh Testnet V2 Work V2 genesis, chain ID 9280.
 
-### Does one wallet always receive a block?
+### Does a seat guarantee blocks or income?
 
-No. One wallet/one seat is an upper bound on canonical seats per epoch, not a guaranteed seat, block, reward, or income. The wallet must satisfy all protocol rules and valid work still has probabilistic cost.
+No. A seat provides equal deterministic consensus weight, not guaranteed production, reward, uptime or profit.
 
-### Can I run more than one miner?
+### Can several processes using the same wallet create several seats?
 
-Yes, for redundancy or to search for the wallet's first valid proof. Multiple processes using the same wallet must not create multiple canonical seats for that wallet in one epoch.
+No. Canonical validation rejects a participant that already owns a persistent seat.
 
-### Can one person create many wallets?
+### Can one person create multiple wallets?
 
-Yes. LCQ does not prove human identity. Work, bond, activation delay, activity, and penalty rules are intended to make mass participation costly and observable, but they cannot eliminate every Sybil strategy.
+Yes. LCQ does not prove human identity. Every wallet must independently complete admission, but Sybil risk is not eliminated.
 
-### Is expensive mining hardware required?
+### What happens when no miner remains online?
 
-RandomX is designed for general-purpose CPUs, but performance still varies by processor, memory, configuration, energy cost, software, and network difficulty. The project does not promise equal hardware performance or profit.
-
-### Is Rabbit Chain an Ethereum network?
-
-Rabbit is an independent network with its own consensus, chain IDs, native asset, genesis, peers, and canonical history. EVM compatibility means it reuses the Ethereum execution environment and common tooling; it does not mean Ethereum secures Rabbit.
-
-### Who controls the queue?
-
-No RPC, explorer, bootnode, website, or administrator should assign queue positions. Each validating node derives the queue from canonical protocol state.
+The chain pauses. After a two-minute canonical halt, permissionless recovery admission can resume the preserved history.
 
 ### What happens if the official RPC or explorer stops?
 
-The chain can continue when independent peers and producers remain active. Users may run their own node, and community operators may provide alternative RPCs and explorers. Official services are access infrastructure, not consensus authorities.
-
-### What happens when no miner is online?
-
-Block production may stop. When valid participation returns, recovery proceeds from preserved canonical history under the active rules; the chain is not supposed to erase history or appoint a secret emergency producer.
+Independent nodes can continue when peers and producers remain online. Anyone may run a node, RPC, explorer or bootnode; official services have no consensus authority.
 
 ### Are testnet tokens valuable?
 
-Testnet assets have no promised monetary value. Any separate participation reward program follows its own published eligibility, verification, timing, legal, and anti-abuse rules.
-
-### Where are final parameters found?
-
-In this order of authority: canonical chain state, released genesis/configuration, versioned source code, signed release artifacts, and then explanatory documentation such as this whitepaper.
+No promised monetary value. Any separate participation program follows its final published rules.
 
 ## 19. Glossary
 
 | Term | Meaning in Rabbit Chain |
 |---|---|
-| Activation delay | Waiting period between participant recognition and eligibility for queue influence |
-| Bond | Protocol-defined economic requirement associated with participant eligibility |
-| Bootnode | Peer-discovery entry point; it does not control consensus |
-| Canonical chain | The history accepted under the active consensus rules |
-| Committee | Deterministically selected eligible participants sharing the configured committee reward |
-| EVM | Ethereum Virtual Machine execution environment used for accounts and smart contracts |
-| Epoch | Fixed block interval used to organize work, eligibility, or seat accounting |
-| Fallback | Rule that permits another eligible producer after a scheduled producer misses its allowed window |
-| Genesis | The network's initial block and configuration; its hash identifies the chain history |
-| Jailing | Temporary protocol state that makes a sanctioned participant ineligible |
-| LCQ | Live Consensus Queue, Rabbit's consensus and production-order mechanism |
-| Participant | Wallet-addressed entity tracked by the canonical LCQ registry |
-| Producer | Eligible participant scheduled to construct and sign a particular block |
-| RandomX | CPU-oriented proof-of-work algorithm used by Rabbit's Work V1 path |
-| Registry | Canonical participant state used to determine eligibility |
-| RPC | Remote interface used by wallets and applications to query or submit data to a node |
-| Seat/WorkSeat | Wallet-bounded, epoch-scoped canonical participation position obtained through valid work and eligibility |
-| Sybil attack | Attempt to gain influence by operating many apparent identities |
-| Ticket | Work V1 proof submission bound to a canonical work context |
-| Work context | Epoch, challenge, dataset, difficulty, and related canonical data against which a proof is produced |
+| Admission | One-time RandomX process by which a wallet seeks a persistent seat |
+| Bootnode | Peer-discovery entry point without consensus authority |
+| Canonical chain | History accepted under active validation rules |
+| Committee | Deterministically eligible seats sharing the committee reward |
+| Epoch | Fixed 128-block interval organizing Work V2 admission and selection |
+| LCQ | Live Consensus Queue, Rabbit's deterministic production protocol |
+| Persistent seat | One equal canonical consensus position owned by a non-zero wallet |
+| Producer | Seat selected to construct and sign a particular block |
+| RandomX | CPU-oriented proof algorithm used for admission and recovery |
+| Recovery admission | Permissionless admission opened after a two-minute complete halt |
+| RPC | Remote node interface for wallets and applications |
+| Ticket | Signed Work V2 proof submission bound to canonical context |
 
 ## 20. Conclusion
 
-Rabbit Chain proposes a specific change to permissionless block production: computational effort admits an eligible wallet into a deterministic live queue, while canonical state prevents that wallet from multiplying seats by multiplying processes. LCQ combines this wallet-bounded opportunity with EVM execution, RandomX work, deterministic producer authentication, committee rewards, fallback rules, and recoverable canonical state.
+Rabbit Chain proposes a specific change to permissionless block production: computational effort admits a wallet into a persistent deterministic live queue, while canonical state prevents that wallet from multiplying seats by multiplying processes. LCQ combines this wallet-bounded opportunity with EVM execution, RandomX work, deterministic producer authentication, committee rewards, fallback rules, and recoverable canonical state.
 
-The project should be judged by reproducible code and observable network behavior, not slogans. The next milestone is not a claim of completion; it is a fresh public-testnet deployment whose genesis, binaries, infrastructure, rules, and evidence can be independently inspected from block 1.
+The project should be judged by reproducible code and observable network behavior, not slogans. The current milestone is the fresh public Testnet V2 deployment whose genesis, binaries, infrastructure, rules, and evidence can be independently inspected from block 1.
 
 ---
 
@@ -812,9 +660,10 @@ The project should be judged by reproducible code and observable network behavio
 
 | Version | Date | Description |
 |---|---|---|
+| 1.0 | 2 September 2026 | Public Testnet V2: Work V2 admission, persistent equal seats, 128/256 activation, two-minute recovery, public endpoints and release identity |
 | 0.9-r4 | 30 August 2026 | Repository-wide consistency correction: regenerated allocation PNG, synchronized machine-readable version, separated the 10,000,000 RAB genesis reserve from consensus issuance, and clarified activation-delay observability |
 | 0.9-r3 | 30 August 2026 | Monetary-policy reconciliation: 15,000,000 RAB genesis allocation, active era schedule, permanent 0.15 RAB tail emission, immediate mining rewards, and committee zero-recipient behavior |
-| 0.9 | 29 August 2026 | Pre-testnet technical edition; LCQ architecture, 15,000,000 RAB genesis allocation, 100,000 RAB testnet reserve sourced from the former operations allocation, contract/treasury transparency framework, validation evidence, risks, launch gates, participation guide, FAQ, and glossary |
+| 0.9 | 29 August 2026 | Public Testnet V2 technical edition; LCQ architecture, 15,000,000 RAB genesis allocation, 100,000 RAB testnet reserve sourced from the former operations allocation, contract/treasury transparency framework, validation evidence, risks, launch gates, participation guide, FAQ, and glossary |
 
 ## Contact and official channels
 
