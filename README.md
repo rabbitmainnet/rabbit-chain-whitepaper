@@ -2,8 +2,8 @@
 
 ## Permissionless EVM Layer 1 with Live Consensus Queue
 
-**Technical Whitepaper - Public Testnet V2 Edition v1.0**
-**2 September 2026**
+**Technical Whitepaper - Public Testnet V2 Edition v1.1**
+**4 September 2026**
 
 > One wallet. One persistent equal consensus seat.
 
@@ -18,8 +18,8 @@
 | Native test asset | `tRAB` |
 | Consensus | LCQ with permissionless Work V2 admission |
 | Execution | EVM / EIP-1559 |
-| Release | `rabbit-core-testnet-v2` |
-| Source commit | `302b8b27a16e943a216a7403b017e2397ea15664` |
+| Release | `rabbit-core-testnet-v2.1` |
+| Source commit | `6ec93b2195d4f5bba2c0fcada2111ddb019c84e2` |
 | Genesis file SHA-256 | `e2e5494542e37689cb6e385456d6df239e478c1d12e9c3a1cc270e69c6b51686` |
 | Canonical block-0 hash | `0x9b71d7f2922fdf8383a4a12be5594e25938625195e0d84c05c3bd71b7bcf93f7` |
 | Public RPC | <https://rpc-testnet.rabbitchain.org> |
@@ -113,30 +113,34 @@ This comparison is conceptual. Individual PoW and PoS networks differ, and the R
 
 ### 3.1 Admission is separate from continuing influence
 
-Rabbit Work V2 uses RandomX for permissionless, one-time admission. A wallet that obtains a canonical admission waits for activation and then owns one persistent equal consensus seat. RandomX stops automatically for that identity after activation. Faster CPUs may find the initial proof sooner, but cannot give an admitted wallet extra seats or recurring selection weight.
+Rabbit Work V2 uses RandomX for permissionless, one-time admission. RandomX admission is not recurring block mining: it is the entry mechanism by which a wallet proves eligibility for one persistent equal LCQ seat. After a valid proof is accepted, the wallet waits for canonical selection and activation. Actual LCQ block-production and committee participation begin only when the wallet becomes `LCQ ACTIVE`. Faster CPUs may find the initial admission proof sooner, but cannot give an admitted wallet extra seats or recurring consensus weight.
 
 This invariant is wallet-bounded, not person-bounded. LCQ does not prove human identity. A person may operate multiple wallets, but every additional non-zero wallet must independently complete the same public admission process.
 
 ### 3.2 Fresh-network lifecycle
 
-| Canonical height | Work V2 state |
+| Fresh-chain canonical height | Work V2 state |
 |---|---|
-| Blocks 1-127 | Bootstrap history; miners wait safely |
-| Block 128 | First admission epoch opens and the 1 GiB RandomX dataset is prepared |
-| Blocks 129-255 | Valid admissions may become canonical and display `ADMISSION_PENDING` |
-| Block 256 | First canonical admissions activate as persistent equal seats |
-| After activation | `ACTIVE_SEAT`; RandomX ends while LCQ participation continues |
+| Blocks 1-127 | Bootstrap history; new admission is not yet active |
+| Block 128 | The first Work V2 admission epoch opens and the 1 GiB RandomX dataset may be prepared |
+| Blocks 129-255 | Accepted admissions wait for canonical selection and activation; Rabbit Miner reports `LCQ PENDING` |
+| Block 256 | The first canonical admissions may activate as persistent equal LCQ seats |
+| After activation | Rabbit Miner reports `LCQ ACTIVE` / `ACTIVE LCQ seat`; RandomX admission work is complete while LCQ participation continues |
 
-At the 10-second target, blocks 128 and 256 are approximately 21 and 43 minutes after genesis. Canonical height, not a local timer, controls activation. A paused or slower network takes longer.
+Blocks 128 and 256 describe the first admission and activation boundaries of a fresh Rabbit Chain network. They are not absolute waiting heights for miners joining an already-running network. On the live Testnet, new wallets follow the current canonical 128-block epochs. Depending on when a wallet joins and when its proof becomes canonical, the admission-to-activation path can cross roughly one to two epoch boundaries. Canonical chain progress, not a local timer, controls activation; a paused or slower network therefore takes longer.
 
 ### 3.3 Miner messages
 
-- `no commit window` means the miner is waiting safely for a valid canonical admission window.
-- `Preparing the Rabbit RandomX 1 GiB dataset` means epoch initialization is in progress.
-- `Mining Work V2 admission` reports attempts and local admission hash rate.
-- `ADMISSION_PENDING state=accepted_by_local_relay` means local acceptance exists but canonical confirmation is pending.
-- `ADMISSION_PENDING state=canonical_waiting_for_activation` means the proof is canonical; duplicate mining is unnecessary.
-- `ACTIVE_SEAT` means the wallet owns one persistent equal seat. A later `committed=false` is expected because activation consumed the temporary commitment.
+Rabbit Miner presents the admission and activation lifecycle in user-facing states:
+
+- `Mining: WAITING` means the node is synchronizing or waiting for the canonical state required for admission.
+- `Preparing RandomX 1 GiB dataset` means Work V2 admission preparation is in progress. This is admission work, not LCQ block mining.
+- `Searching for this wallet's Work V2 admission proof` means the wallet is performing its one-time RandomX admission search.
+- `Work V2 admission proof accepted` means the proof was accepted; duplicate admission mining is unnecessary.
+- `LCQ PENDING` means admission has been accepted but the persistent seat is still waiting for canonical selection and activation.
+- `LCQ ACTIVE` / `ACTIVE LCQ seat` means the wallet owns one persistent equal consensus seat and is actively participating in LCQ.
+- `PRODUCER` marks a canonical block produced by the wallet.
+- `COMMITTEE` marks a committee reward detected for the wallet.
 
 ### 3.4 Canonical enforcement
 
@@ -501,7 +505,7 @@ Before mainnet, Rabbit Chain remains experimental software. Testnet results redu
 
 The Testnet V2 release passed regressions across LCQ, Ethereum networking, downloader, miner, parameters, Rabbit Miner, Rabbit Core and core execution. A persistent three-node live lab demonstrated full peer connectivity, permissionless admission from three wallets, exactly three persistent equal seats, block production by all three participants, persistence across restart, canonical 70/30 rewards, a real EIP-1559 transaction and recovery-state telemetry.
 
-GitHub Actions built and verified Windows AMD64 and Linux AMD64 archives from commit `302b8b27a16e943a216a7403b017e2397ea15664`. Validation is evidence, not proof that defects are impossible; Testnet V2 remains experimental.
+The official Rabbit Core Testnet V2.1 Windows AMD64 and Linux AMD64 release archives correspond to source commit `6ec93b2195d4f5bba2c0fcada2111ddb019c84e2` and are published with SHA-256 verification values. The final release was exercised against fresh synchronization, public P2P bootstrap, historical replay, restart persistence, Work V2 admission, `LCQ PENDING`, persistent-seat activation, producer rewards and committee rewards. Validation is evidence, not proof that defects are impossible; Testnet V2 remains experimental.
 
 ## 13. Governance and upgrades
 
@@ -523,7 +527,7 @@ Any consensus upgrade should publish:
 ### Public Testnet V2 completed
 
 - Work V2 permissionless admission and persistent-seat regressions;
-- fresh three-node network, blocks 128/256 activation and multi-producer operation;
+- fresh three-node network, first bootstrap admission/activation boundaries at blocks 128/256, and multi-producer operation;
 - producer/committee 70/30 economic audit and real EIP-1559 transaction;
 - reproducible Windows and Linux release archives;
 - public RPC, archive node, explorer, bootnodes and frozen genesis identity;
@@ -562,11 +566,11 @@ Users should verify downloaded binaries against published hashes and obtain hash
 | Planned mainnet chain ID | 928 |
 | Target block time | 10,000 ms |
 | Epoch length | 128 blocks |
-| First admission height | 128 |
-| First activation height | 256 |
+| Fresh-chain first admission height | 128 |
+| Fresh-chain first activation height | 256 |
 | Recovery halt threshold | 2 minutes |
 | Producer / committee reward | 70% / 30% |
-| Initial base reward | 1.20 RAB |
+| Current Testnet base reward | 1.20 tRAB |
 | Reward era length | 8,409,600 blocks |
 | Reward schedule | 1.20 -> 0.60 -> 0.30 -> 0.15 RAB |
 | Tail emission | 0.15 RAB per block |
@@ -574,14 +578,18 @@ Users should verify downloaded binaries against published hashes and obtain hash
 | RandomX dataset base size | 1 GiB |
 | Seat rule | At most one persistent equal seat per non-zero wallet |
 
+On the public Testnet, user-facing mining rewards are denominated in `tRAB`, the test asset with no promised monetary value. References to `RAB` in the monetary-policy sections describe the protocol reward schedule; the Testnet uses the corresponding test denomination `tRAB`.
+
 ## 17. How to participate
 
-1. Open `https://rabbitchain.org/mining` and follow the official GitHub release link.
-2. Download the Windows AMD64 ZIP or Linux AMD64 tarball and verify its SHA-256.
-3. Run Rabbit Core, create a strong local password and back up the exact encrypted `UTC--...` keystore file it prints. Keep the password separately.
-4. Keep Rabbit Core open while its full node synchronizes and admission becomes available.
-5. Wait for `ADMISSION_PENDING`, then `ACTIVE_SEAT`. Do not delete the data directory or repeatedly mine duplicate admissions.
-6. After activation, keep the node online for LCQ consensus participation.
+1. Open `https://rabbitchain.org/mining` and follow the official Rabbit Core Testnet V2.1 release link.
+2. Download the Windows AMD64 ZIP or Linux AMD64 tarball and verify its published SHA-256 before running it.
+3. Start Rabbit Core, create a strong local password and back up the exact encrypted `UTC--...` keystore file it prints. Keep the password separately.
+4. Keep Rabbit Core open while it automatically connects to the Rabbit Testnet P2P network and synchronizes the canonical blockchain. No public RPC, WebSocket endpoint or manual peer configuration is required to begin mining.
+5. After synchronization, Work V2 may prepare the 1 GiB RandomX dataset and search for the wallet's one-time admission proof. This is admission work, not recurring LCQ block mining.
+6. After the proof is accepted, Rabbit Miner reports `LCQ PENDING`. No duplicate admission proof is needed; keep Rabbit Core running while canonical selection and activation progress.
+7. When Rabbit Miner reports `LCQ ACTIVE` / `ACTIVE LCQ seat`, the wallet owns one persistent equal consensus seat and is actively participating in LCQ.
+8. Keep Rabbit Core online. `PRODUCER` identifies blocks produced by the wallet, while `COMMITTEE` identifies committee rewards detected for it.
 
 | Operating system | Main Rabbit Core directory |
 |---|---|
@@ -596,7 +604,7 @@ Never give a password, private key, seed phrase or keystore to a website, RPC, e
 
 ### Is the public testnet live?
 
-Yes. This edition documents the fresh Testnet V2 Work V2 genesis, chain ID 9280.
+Yes. This edition documents the live Rabbit Testnet V2, chain ID 9280, its Work V2 admission lifecycle and Rabbit Core Testnet V2.1 release identity.
 
 ### Does a seat guarantee blocks or income?
 
@@ -660,7 +668,8 @@ The project should be judged by reproducible code and observable network behavio
 
 | Version | Date | Description |
 |---|---|---|
-| 1.0 | 2 September 2026 | Public Testnet V2: Work V2 admission, persistent equal seats, 128/256 activation, two-minute recovery, public endpoints and release identity |
+| 1.1 | 4 September 2026 | Rabbit Core Testnet V2.1 alignment: final release identity, live-network 128-block epoch clarification, RandomX admission versus LCQ participation, `LCQ PENDING` / `LCQ ACTIVE` miner states, and updated participation flow |
+| 1.0 | 2 September 2026 | Public Testnet V2: Work V2 admission, persistent equal seats, fresh-network 128/256 activation, two-minute recovery, public endpoints and release identity |
 | 0.9-r4 | 30 August 2026 | Repository-wide consistency correction: regenerated allocation PNG, synchronized machine-readable version, separated the 10,000,000 RAB genesis reserve from consensus issuance, and clarified activation-delay observability |
 | 0.9-r3 | 30 August 2026 | Monetary-policy reconciliation: 15,000,000 RAB genesis allocation, active era schedule, permanent 0.15 RAB tail emission, immediate mining rewards, and committee zero-recipient behavior |
 | 0.9 | 29 August 2026 | Public Testnet V2 technical edition; LCQ architecture, 15,000,000 RAB genesis allocation, 100,000 RAB testnet reserve sourced from the former operations allocation, contract/treasury transparency framework, validation evidence, risks, launch gates, participation guide, FAQ, and glossary |
