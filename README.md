@@ -443,7 +443,7 @@ Official launch infrastructure must use fresh datadirs, chaindata, node keys, da
 | Explorer | `https://explorer-testnet.rabbitchain.org/` | Active |
 | Source and releases | `https://github.com/rabbitmainnet/rabbit-geth` | Active |
 | Whitepaper | `https://github.com/rabbitmainnet/rabbit-chain-whitepaper` | Active |
-| Faucet | `https://faucet-testnet.rabbitchain.org/` | Not active |
+| Faucet | `https://rabbitchain.org/platform/faucet/` | Active |
 
 Official bootnodes:
 
