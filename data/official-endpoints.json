@@ -1,5 +1,5 @@
 {
-  "document_version": "1.0",
+  "document_version": "1.2",
   "status_meaning": "reserved is not live; active requires DNS, TLS, chain identity, and health verification",
   "shared": {
     "website": {
@@ -46,9 +46,13 @@
       "enode://867431475238a2da10b62aeb2197d00baa4880f66b14ca97ec99ef51d13143791cf89893a8f41e1fcf1bd0e0f1ef86081d0c28b268953f723e6dd3c18efc8a39@137.184.105.140:30303",
       "enode://b345298a2e97c249e2e7987f7a7b9289d7f0f6bc02b06bba8d7b6c478ae62a293952c8187fb67c30d2ecf60332080b79a8ab3584d4d87d34bf549e6122208b07@162.243.49.184:30303"
     ],
-    "genesis_file_sha256": "e2e5494542e37689cb6e385456d6df239e478c1d12e9c3a1cc270e69c6b51686",
-    "release_tag": "rabbit-core-testnet-v2",
-    "release_commit": "302b8b27a16e943a216a7403b017e2397ea15664"
+    "genesis_file_sha256": "dfbc8992c5d9bce8684428ed43ca98494bb1745571c966915f8fec1a44157839",
+    "release_tag": "rabbit-core-testnet-v2.2.2",
+    "release_commit": "249380bdd23582c4a1194b71e9f12f4cdd214472",
+    "release_url": "https://github.com/rabbitmainnet/rabbit-geth/releases/tag/rabbit-core-testnet-v2.2.2",
+    "consensus_hardening_block": 50000,
+    "windows_amd64_sha256": "7b3cdc9f0971a82daa97f42a64b72543a6da5055dcff0eebef2a05e5614cf6e4",
+    "linux_amd64_sha256": "722262eec170c819946574c2321d50d3e04558506f653fc38d4c79ff6c323ba8"
   },
   "mainnet": {
     "chain_id": 928,

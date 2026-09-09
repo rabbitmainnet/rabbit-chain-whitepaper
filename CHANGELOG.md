@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2 - Rabbit Core Testnet V2.2.2 hard-fork upgrade
+
+- Published the required consensus-hardening activation at Testnet block 50000.
+- Documented deterministic WorkSeat liveness and the one-second future timestamp tolerance after activation.
+- Documented the in-place upgrade path preserving chain history, datadir, wallet, keystore, balances, contracts and persistent WorkSeat.
+- Published the V2.2.2 source commit, Windows/Linux archive hashes and updated genesis-file checksum.
+- Recorded successful existing-wallet upgrade testing and matching RPC/Explorer canonical-chain validation.
+- Confirmed that the canonical block-0 hash remains unchanged and that no network reset occurs.
+
 ## v1.0 - Public Testnet V2
 
 - Published the verified Testnet V2 network identity, endpoints, bootnodes, genesis and release commit.

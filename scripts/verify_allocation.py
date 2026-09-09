@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 data = json.loads((ROOT / "data" / "economic-allocation.json").read_text(encoding="utf-8"))
 
-assert data["document_version"] == "1.0"
+assert data["document_version"] == "1.2"
 assert data["finite_maximum_supply"] is False
 
 maximum = data["genesis_allocation_rab"]
