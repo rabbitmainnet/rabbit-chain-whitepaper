@@ -2,8 +2,8 @@
 
 ## Permissionless EVM Layer 1 with Live Consensus Queue
 
-**Technical Whitepaper - Public Testnet V2 Edition v1.2**
-**9 September 2026**
+**Technical Whitepaper - Public Testnet V2 Post-Stabilization Edition v1.3**
+**11 September 2026**
 
 > One wallet. One persistent equal consensus seat.
 
@@ -18,10 +18,11 @@
 | Native test asset | `tRAB` |
 | Consensus | LCQ with permissionless Work V2 admission |
 | Execution | EVM / EIP-1559 |
-| Release | `rabbit-core-testnet-v2.2.2` |
-| Source commit | `249380bdd23582c4a1194b71e9f12f4cdd214472` |
-| Required hard-fork block | `50000` |
-| Genesis file SHA-256 | `dfbc8992c5d9bce8684428ed43ca98494bb1745571c966915f8fec1a44157839` |
+| Release | `rabbit-core-testnet-v2.2.3` |
+| Source commit | `42ed7d943bad9143d23ae821d6d23c332b46e1b7` |
+| Consensus hardening block | `50000` |
+| Consensus stabilization block | `50500` |
+| Genesis file SHA-256 | `ab66857a5b28da355ff270ced29176ac151e70e8281dbad8fc8d24a2192fc71b` |
 | Canonical block-0 hash | `0x9b71d7f2922fdf8383a4a12be5594e25938625195e0d84c05c3bd71b7bcf93f7` |
 | Public RPC | <https://rpc-testnet.rabbitchain.org> |
 | Explorer | <https://explorer-testnet.rabbitchain.org> |
@@ -189,6 +190,18 @@ Beginning at block 50000:
 - producer, fallback, committee and reward selection continue from one canonical queue.
 
 This is an in-place hard fork, not a network restart. It does not replace block 0, erase history, reset balances or contracts, replace wallets or keystores, delete WorkSeats, or require existing participants to register again.
+
+### 5.6 Testnet consensus stabilization at block 50500
+
+Rabbit Core Testnet V2.2.3 schedules the stabilization activation of this Testnet upgrade sequence at canonical block **50500**. This activation does not replace the block-50000 consensus-hardening history. Blocks through 50499 retain the rules applicable at their canonical heights.
+
+V2.2.3 was released from source commit `42ed7d943bad9143d23ae821d6d23c332b46e1b7`. The stabilization release incorporates the recovery and persistent-seat corrections required after live Testnet observation, including preservation and recovery of canonical WorkSeats across restart/recovery paths and permissionless resumption of canonical LCQ production.
+
+The activation is an **in-place upgrade**. It does not create a new chain, replace block 0, erase balances or transactions, delete contracts, replace wallets or keystores, or intentionally delete existing persistent WorkSeats.
+
+After activation, nodes running pre-V2.2.3 consensus rules may remain technically reachable at the P2P transport layer but are not compatible producers for the canonical V2.2.3 chain. Incompatible blocks are rejected by upgraded consensus validation. Operators running an older Rabbit Core release must upgrade before resuming Testnet mining or node operation.
+
+The public post-fork validation record is published in `docs/Testnet-V2.2.3-Stabilization-Report.md`.
 
 ## 6. Committee and rewards
 
@@ -521,9 +534,9 @@ Before mainnet, Rabbit Chain remains experimental software. Testnet results redu
 
 The Testnet V2 release passed regressions across LCQ, Ethereum networking, downloader, miner, parameters, Rabbit Miner, Rabbit Core and core execution. A persistent three-node live lab demonstrated full peer connectivity, permissionless admission from three wallets, exactly three persistent equal seats, block production by all three participants, persistence across restart, canonical 70/30 rewards, a real EIP-1559 transaction and recovery-state telemetry.
 
-The official Rabbit Core Testnet V2.2.2 Windows AMD64 and Linux AMD64 release archives correspond to source commit `249380bdd23582c4a1194b71e9f12f4cdd214472`. The Windows archive SHA-256 is `7b3cdc9f0971a82daa97f42a64b72543a6da5055dcff0eebef2a05e5614cf6e4`; the Linux archive SHA-256 is `722262eec170c819946574c2321d50d3e04558506f653fc38d4c79ff6c323ba8`.
+The current official Rabbit Core Testnet V2.2.3 Windows AMD64 and Linux AMD64 release archives correspond to source commit `42ed7d943bad9143d23ae821d6d23c332b46e1b7`. The Windows archive SHA-256 is `6cb9335cb412f86bfe7ff02fb01488ee231e5e9bde9788edf27f49a117719fbb`; the Linux archive SHA-256 is `3152fca57f91d7128f01f5e143d6c0accadfead86b173129c4f20c9e378cf4e4`.
 
-The upgrade path was exercised against an existing Windows datadir and encrypted mining wallet. Rabbit Core applied the scheduled configuration, rebuilt canonical LCQ state, reused the same wallet and chain history, restored the existing active WorkSeat, synchronized with the public network and observed continuing committee rewards. The official RPC and archive Explorer node were upgraded in place and independently returned chain ID 9280, the unchanged canonical block-0 hash and matching canonical block hashes. Validation is evidence, not proof that defects are impossible; Testnet V2 remains experimental.
+The V2.2.3 upgrade path was exercised against an existing Windows datadir and encrypted mining wallet. Rabbit Core rebuilt canonical LCQ state, reused the same wallet and chain history, restored the existing active WorkSeat, synchronized automatically and resumed canonical LCQ participation. The public RPC and Explorer nodes crossed block 50500 on the same canonical chain. A direct post-fork comparison at block 50698 returned the same hash `0xc128c9aa7c35d631c090514e60f9db48fce7411b02ac6d66f824945363ab4606` from both nodes. A later 40-block RPC sample measured a 10.22-second mean, 10-second median, 13-second maximum and zero intervals above 20 seconds. Validation is evidence, not proof that defects are impossible; Testnet V2 remains experimental.
 
 ## 13. Governance and upgrades
 
@@ -588,6 +601,7 @@ Users should verify downloaded binaries against published hashes and obtain hash
 | Fresh-chain first activation height | 256 |
 | Recovery halt threshold | 2 minutes |
 | Consensus-hardening activation | Block 50000 |
+| Consensus-stabilization activation | Block 50500 |
 | Future timestamp tolerance before block 50000 | 30 seconds |
 | Future timestamp tolerance from block 50000 | 1 second |
 | Producer / committee reward | 70% / 30% |
@@ -621,15 +635,19 @@ Within that directory, the wallet is under `keystore/UTC--...`, chain data under
 
 ### 17.1 Required upgrade for existing participants
 
-Existing miners and node operators must upgrade before block 50000:
+Any miner or node still running a Rabbit Core release older than **V2.2.3** must upgrade before participating beyond canonical block **50500**.
 
-1. Back up the encrypted `UTC--...` keystore file and keep its password separately.
-2. Close the previous Rabbit Core application.
-3. Extract V2.2.2 into a new application folder.
-4. Start `Start-Rabbit-Core.cmd` on Windows or `Start-Rabbit-Core.sh` on Linux.
-5. Keep the existing Rabbit Testnet datadir, wallet and WorkSeat.
-6. Do not delete chain data, create a replacement wallet or register again.
-7. Keep Rabbit Core open while it applies the official configuration and rebuilds canonical LCQ state. This first upgraded start can take several minutes.
+1. Stop the older Rabbit Core normally.
+2. Download the official V2.2.3 archive from <https://rabbitchain.org/mining/>.
+3. Verify the published archive SHA-256.
+4. Extract the new release.
+5. Keep the existing Rabbit Testnet datadir, encrypted wallet, keystore and password.
+6. Start V2.2.3 using the normal Rabbit Core launcher.
+7. Keep Rabbit Core open while it verifies/rebuilds canonical LCQ state and synchronizes.
+8. Wait for `LCQ ACTIVE` before treating the wallet as an active canonical participant.
+
+Do **not** delete the blockchain, datadir, keystore or WorkSeat state as part of this upgrade. Pre-V2.2.3 software is not a compatible canonical producer after block 50500.
+
 
 Never give a password, private key, seed phrase or keystore to a website, RPC, explorer, faucet, administrator or support agent.
 
@@ -637,7 +655,7 @@ Never give a password, private key, seed phrase or keystore to a website, RPC, e
 
 ### Is the public testnet live?
 
-Yes. This edition documents the live Rabbit Testnet V2, chain ID 9280, its Work V2 admission lifecycle, the required block-50000 hard fork and Rabbit Core Testnet V2.2.2 release identity.
+Yes. This edition documents the live Rabbit Testnet V2, chain ID 9280, its Work V2 admission lifecycle, the block-50000 consensus hardening, the block-50500 stabilization activation and the current Rabbit Core Testnet V2.2.3 release identity.
 
 ### Does a seat guarantee blocks or income?
 
@@ -701,6 +719,7 @@ The project should be judged by reproducible code and observable network behavio
 
 | Version | Date | Description |
 |---|---|---|
+| 1.3 | 11 September 2026 | Rabbit Core Testnet V2.2.3 post-stabilization edition: block-50500 activation, preserved in-place wallet/datadir/WorkSeat upgrade, Windows/Linux release hashes, canonical RPC/Explorer convergence, post-fork 10-second cadence evidence, deterministic fork-recovery observation and disclosed ForkID compatibility limitation |
 | 1.2 | 9 September 2026 | Rabbit Core Testnet V2.2.2 required hard-fork upgrade: block-50000 activation, deterministic WorkSeat liveness, one-second future timestamp tolerance, preserved chain/wallet/WorkSeat upgrade path, release hashes and public infrastructure validation |
 | 1.1 | 4 September 2026 | Rabbit Core Testnet V2.1 alignment: final release identity, live-network 128-block epoch clarification, RandomX admission versus LCQ participation, `LCQ PENDING` / `LCQ ACTIVE` miner states, and updated participation flow |
 | 1.0 | 2 September 2026 | Public Testnet V2: Work V2 admission, persistent equal seats, fresh-network 128/256 activation, two-minute recovery, public endpoints and release identity |

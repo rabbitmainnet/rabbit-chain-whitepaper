@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.3 - Rabbit Core Testnet V2.2.3 stabilization
+
+- Published Rabbit Core Testnet V2.2.3 from source commit `42ed7d943bad9143d23ae821d6d23c332b46e1b7`.
+- Documented the consensus-stabilization activation at canonical block 50500 while preserving the historical block-50000 hardening record.
+- Published Windows AMD64 SHA-256 `6cb9335cb412f86bfe7ff02fb01488ee231e5e9bde9788edf27f49a117719fbb`.
+- Published Linux AMD64 SHA-256 `3152fca57f91d7128f01f5e143d6c0accadfead86b173129c4f20c9e378cf4e4`.
+- Recorded successful in-place Windows upgrade using the existing encrypted wallet, datadir, chain history and active WorkSeat.
+- Recorded canonical RPC/Explorer convergence at block 50698 with hash `0xc128c9aa7c35d631c090514e60f9db48fce7411b02ac6d66f824945363ab4606`.
+- Recorded post-stabilization cadence evidence: 40-block sample, 10.22-second mean, 10-second median, 13-second maximum and no interval above 20 seconds.
+- Recorded deterministic same-height fork choice and one-block reorganization observed during post-fork convergence.
+- Disclosed that Rabbit-specific LQC fork activations are not currently encoded into the EIP-2124 fork ID because they are nested in `LQCConfig`; older clients can remain P2P-connected even though incompatible blocks are rejected by canonical consensus.
+- Added a dedicated public stabilization report and made ForkID compatibility hardening a pre-mainnet requirement.
+
+
 ## v1.2 - Rabbit Core Testnet V2.2.2 hard-fork upgrade
 
 - Published the required consensus-hardening activation at Testnet block 50000.
