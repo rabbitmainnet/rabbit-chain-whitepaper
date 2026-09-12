@@ -176,6 +176,21 @@ If every producer goes offline, the chain pauses at its last valid canonical blo
 
 Recovery still requires verifiable work and propagation. Deleting history or appointing a trusted emergency producer is not part of the protocol.
 
+```mermaid
+flowchart TD
+    A[Canonical producer slot] --> B{Valid block published in time?}
+    B -->|Yes| C[Canonical chain advances]
+    B -->|No| D[Bounded fallback]
+    D --> E{Eligible fallback producer available?}
+    E -->|Yes| C
+    E -->|No| F[Complete producer outage]
+    F --> G[Two-minute canonical halt]
+    G --> H[Permissionless RandomX recovery admission]
+    H --> I[Preserved canonical history resumes]
+```
+
+*Figure 2. A missed producer advances through public fallback rules. If no eligible participant remains, the chain waits and later resumes from preserved canonical history.*
+
 ### 5.5 Testnet consensus hardening at block 50000
 
 Rabbit Core Testnet V2.2.2 schedules a required Rabbit Testnet consensus upgrade at canonical block **50000**. Historical blocks through 49999 retain their existing validation behavior.
@@ -200,6 +215,8 @@ V2.2.3 was released from source commit `42ed7d943bad9143d23ae821d6d23c332b46e1b7
 The activation is an **in-place upgrade**. It does not create a new chain, replace block 0, erase balances or transactions, delete contracts, replace wallets or keystores, or intentionally delete existing persistent WorkSeats.
 
 After activation, nodes running pre-V2.2.3 consensus rules may remain technically reachable at the P2P transport layer but are not compatible producers for the canonical V2.2.3 chain. Incompatible blocks are rejected by upgraded consensus validation. Operators running an older Rabbit Core release must upgrade before resuming Testnet mining or node operation.
+
+A known compatibility limitation remains in the current Testnet implementation: Rabbit-specific consensus activation heights stored under `LQCConfig` are not currently encoded into the advertised **EIP-2124 ForkID**. This allows an older client to remain P2P-connected after a Rabbit-specific consensus activation even though upgraded consensus rejects its incompatible blocks. Rabbit-specific ForkID compatibility enforcement and mixed-version regression tests are required before Mainnet.
 
 The public post-fork validation record is published in `docs/Testnet-V2.2.3-Stabilization-Report.md`.
 
@@ -617,7 +634,7 @@ On the public Testnet, user-facing mining rewards are denominated in `tRAB`, the
 
 ## 17. How to participate
 
-1. Open `https://rabbitchain.org/mining` and follow the official Rabbit Core Testnet V2.2.2 release link.
+1. Open `https://rabbitchain.org/mining` and follow the official Rabbit Core Testnet V2.2.3 release link.
 2. Download the Windows AMD64 ZIP or Linux AMD64 tarball and verify its published SHA-256 before running it.
 3. Start Rabbit Core, create a strong local password and back up the exact encrypted `UTC--...` keystore file it prints. Keep the password separately.
 4. Keep Rabbit Core open while it automatically connects to the Rabbit Testnet P2P network and synchronizes the canonical blockchain. No public RPC, WebSocket endpoint or manual peer configuration is required to begin mining.
