@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.4 - Rabbit Core Testnet V2.2.5 Fairness/Liveness
+
+- Published Rabbit Core Testnet V2.2.5 from source commit `ed6fb1692392ce93886d112d84142b8aa487fceb`.
+- Scheduled the Fairness/Liveness consensus activation at canonical block 73000 while preserving the block-50000 hardening and block-50500 stabilization history.
+- Documented deterministic producer ordering after activation without legacy stale-jail reordering, while preserving separate committee eligibility filtering.
+- Documented the deterministic transition clearing legacy `MissedTurns` / `JailedUntil` state at the activation boundary.
+- Preserved persistent WorkSeats, permissionless fallback/recovery and the 70% producer / 30% committee reward model.
+- Published Windows AMD64 SHA-256 `08a7cf8d79b8183cdde641fa06157b60c92329105e31965492ccc1b32031c945`.
+- Published Linux AMD64 SHA-256 `f376de87e944624834ea9128018ed4ee42df7ab6e55779dfded5085aacf7ca35`.
+- Updated the official Testnet genesis-file SHA-256 to `ef115b86fe0225b8fddd41d61ff9576c08960b97bd4e1e374fcfa0cee4ec7ad9`.
+- Documented Rabbit Core V2.2.5 non-destructive local-state reuse and supervised node restart behavior.
+- Added a dedicated V2.2.5 Fairness/Liveness upgrade record.
+
 ## v1.3 - Rabbit Core Testnet V2.2.3 stabilization
 
 - Published Rabbit Core Testnet V2.2.3 from source commit `42ed7d943bad9143d23ae821d6d23c332b46e1b7`.

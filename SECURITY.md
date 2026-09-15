@@ -6,13 +6,13 @@ Until a dedicated responsible-disclosure address is published and verified on `h
 
 The final mainnet release must replace this interim process with a dedicated security contact, encrypted reporting option, response targets, scope, safe-harbor language where legally appropriate, and disclosure policy.
 
-## Testnet V2.2.3 known P2P compatibility limitation
+## Testnet V2.2.5 known P2P compatibility limitation
 
 **Status: disclosed on 11 September 2026. Mainnet remediation required.**
 
-Rabbit-specific consensus activation heights are currently stored under the nested `LQCConfig`. The current EIP-2124 fork-ID gathering logic reflects the top-level `ChainConfig` fork fields and therefore does not encode the Rabbit-specific block-50000 and block-50500 activations into the advertised fork ID.
+Rabbit-specific consensus activation heights are currently stored under the nested `LQCConfig`. The current EIP-2124 fork-ID gathering logic reflects the top-level `ChainConfig` fork fields and therefore does not encode the Rabbit-specific block-50000, block-50500 and block-73000 activations into the advertised fork ID.
 
-Operational consequence: a pre-V2.2.3 client may remain connected to an upgraded node at the P2P transport layer after block 50500. This does **not** make its incompatible blocks canonical: upgraded V2.2.3 consensus validation rejects incompatible history, and post-fork canonical production has remained on the upgraded chain.
+Operational consequence: a pre-V2.2.5 client may remain connected to an upgraded node at the P2P transport layer after block 73000. This does **not** make its incompatible blocks canonical: upgraded V2.2.5 consensus validation rejects incompatible history. Post-activation canonical convergence must be recorded from direct live-network observation rather than assumed in advance.
 
 Required remediation before Mainnet:
 
