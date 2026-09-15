@@ -1,10 +1,10 @@
 # Rabbit Chain Testnet V2.2.5 Fairness/Liveness Upgrade Record
 
-**Date:** 14 September 2026  
-**Network:** Rabbit Testnet  
-**Chain ID / Network ID:** `9280` / `9280`  
-**Release:** `rabbit-core-testnet-v2.2.5`  
-**Source commit:** `ed6fb1692392ce93886d112d84142b8aa487fceb`  
+**Date:** 14 September 2026
+**Network:** Rabbit Testnet
+**Chain ID / Network ID:** `9280` / `9280`
+**Release:** `rabbit-core-testnet-v2.2.5`
+**Source commit:** `ed6fb1692392ce93886d112d84142b8aa487fceb`
 **Fairness/Liveness activation:** canonical block `73000`
 
 ## Purpose
