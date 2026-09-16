@@ -47,9 +47,9 @@
       "enode://b345298a2e97c249e2e7987f7a7b9289d7f0f6bc02b06bba8d7b6c478ae62a293952c8187fb67c30d2ecf60332080b79a8ab3584d4d87d34bf549e6122208b07@162.243.49.184:30303"
     ],
     "genesis_file_sha256": "ef115b86fe0225b8fddd41d61ff9576c08960b97bd4e1e374fcfa0cee4ec7ad9",
-    "release_tag": "rabbit-core-testnet-v2.2.5",
-    "release_commit": "ed6fb1692392ce93886d112d84142b8aa487fceb",
-    "release_url": "https://github.com/rabbitmainnet/rabbit-geth/releases/tag/rabbit-core-testnet-v2.2.5",
+    "release_tag": "rabbit-core-testnet-v2.3.0",
+    "release_commit": "7128cb6db44dbecff608a54b4890a03f5e426647",
+    "release_url": "https://github.com/rabbitmainnet/rabbit-geth/releases/tag/rabbit-core-testnet-v2.3.0",
     "consensus_hardening_block": 50000,
     "windows_amd64_sha256": "08a7cf8d79b8183cdde641fa06157b60c92329105e31965492ccc1b32031c945",
     "linux_amd64_sha256": "f376de87e944624834ea9128018ed4ee42df7ab6e55779dfded5085aacf7ca35",
@@ -58,7 +58,8 @@
     "release_assets_sha256": {
       "windows_amd64_zip": "08a7cf8d79b8183cdde641fa06157b60c92329105e31965492ccc1b32031c945",
       "linux_amd64_tar_gz": "f376de87e944624834ea9128018ed4ee42df7ab6e55779dfded5085aacf7ca35"
-    }
+    },
+    "consensus_liveness_v3_block": 77000
   },
   "mainnet": {
     "chain_id": 928,

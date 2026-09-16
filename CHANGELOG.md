@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.5 - Rabbit Core Testnet V2.3.0 Liveness V3
+
+- Published Rabbit Core Testnet V2.3.0 from source commit `7128cb6db44dbecff608a54b4890a03f5e426647`.
+- Scheduled LQC Liveness V3 activation at canonical block 77000.
+- Added deterministic producer rotation, fallback recovery, committee participation claims and reward accounting.
+- Preserved the block-73000 Fairness/Liveness transition as canonical history.
+- Preserved the Testnet blockchain, datadir, encrypted wallet and persistent LCQ state.
+- Recorded verified Windows and Linux artifacts and live pre-activation validation.
+- Added `docs/Testnet-V2.3.0-Liveness-V3-Upgrade.md`.
+
 ## v1.4 - Rabbit Core Testnet V2.2.5 Fairness/Liveness
 
 - Published Rabbit Core Testnet V2.2.5 from source commit `ed6fb1692392ce93886d112d84142b8aa487fceb`.
