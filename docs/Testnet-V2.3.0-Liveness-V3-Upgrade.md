@@ -1,10 +1,10 @@
 # Rabbit Chain Testnet V2.3.0 Liveness V3 Upgrade Record
 
-**Network:** Rabbit Testnet  
-**Chain ID:** `9280`  
-**Release:** `rabbit-core-testnet-v2.3.0`  
-**Source commit:** `7128cb6db44dbecff608a54b4890a03f5e426647`  
-**Liveness V3 activation:** canonical block `77000`  
+**Network:** Rabbit Testnet
+**Chain ID:** `9280`
+**Release:** `rabbit-core-testnet-v2.3.0`
+**Source commit:** `7128cb6db44dbecff608a54b4890a03f5e426647`
+**Liveness V3 activation:** canonical block `77000`
 **Genesis block hash:** `0x9b71d7f2922fdf8383a4a12be5594e25938625195e0d84c05c3bd71b7bcf93f7`
 
 ## Purpose
