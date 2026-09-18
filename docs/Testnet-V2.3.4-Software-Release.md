@@ -1,10 +1,10 @@
 # Rabbit Chain Testnet V2.3.4 Software Release Record
 
-**Date:** 18 September 2026  
-**Network:** Rabbit Testnet  
-**Chain ID / Network ID:** `9280` / `9280`  
-**Current Rabbit Core release:** `v2.3.4`  
-**Source commit:** `b6fda8e6118d6ac7a6af81119120345e80081249`  
+**Date:** 18 September 2026
+**Network:** Rabbit Testnet
+**Chain ID / Network ID:** `9280` / `9280`
+**Current Rabbit Core release:** `v2.3.4`
+**Source commit:** `b6fda8e6118d6ac7a6af81119120345e80081249`
 **Consensus baseline:** LQC Liveness V3, active since canonical block `77000`
 
 ## Purpose
