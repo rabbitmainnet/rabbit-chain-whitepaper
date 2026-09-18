@@ -1,5 +1,15 @@
 # Changelog
 
+## Post-v1.5 - Rabbit Core Testnet V2.3.4 software release
+
+- Published Rabbit Core Testnet V2.3.4 from source commit `b6fda8e6118d6ac7a6af81119120345e80081249`.
+- Preserved Whitepaper v1.5 as the Liveness V3 protocol edition and preserved V2.3.0 as the historical block-77000 activation release.
+- Recorded that V2.3.4 introduces no new scheduled consensus activation block.
+- Documented P2P peer-retention/discovery hardening and clearer Rabbit Miner reward activity reporting.
+- Preserved the existing Testnet blockchain, datadir, encrypted wallet and persistent LCQ participation state.
+- Published verified Windows AMD64, Linux AMD64, macOS Intel/AMD64 and macOS Apple Silicon/ARM64 archive hashes.
+- Added `docs/Testnet-V2.3.4-Software-Release.md`.
+
 ## v1.5 - Rabbit Core Testnet V2.3.0 Liveness V3
 
 - Published Rabbit Core Testnet V2.3.0 from source commit `7128cb6db44dbecff608a54b4890a03f5e426647`.
