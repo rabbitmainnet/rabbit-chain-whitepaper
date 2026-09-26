@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.6 - Rabbit Core Testnet V2.3.6 operational release
+
+- Updated the current official Rabbit Core Testnet release identity to `v2.3.6`.
+- Recorded source commit `aeac6e0542c22d509ef02d3166e45487509dd0fc`.
+- Replaced retired official bootnodes with the current Explorer and RPC discovery nodes.
+- Published verified Windows AMD64, Linux AMD64, macOS AMD64 and macOS ARM64 SHA-256 values.
+- Preserved the existing Rabbit Testnet V2 chain, genesis identity and consensus activation history.
+- Documented that V2.3.6 introduces no new consensus activation and performs no Testnet reset.
+- Updated machine-readable official endpoint and release metadata.
+
 ## Post-v1.5 - Rabbit Core Testnet V2.3.4 software release
 
 - Published Rabbit Core Testnet V2.3.4 from source commit `b6fda8e6118d6ac7a6af81119120345e80081249`.

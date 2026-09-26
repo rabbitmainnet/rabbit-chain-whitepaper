@@ -1,5 +1,7 @@
 local function rabbit_image(path, alt)
-  return pandoc.Para({pandoc.Image(alt, path)})
+  local img = pandoc.Image(alt, path)
+  img.attributes.width = "6.0in"
+  return pandoc.Para({img})
 end
 
 function CodeBlock(block)
