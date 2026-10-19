@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.7 - Rabbit Core v2.4.13 automatic bootstrap edition
+
+- Reconciled the genesis file SHA-256 against the v2.4.13 source genesis; canonical block-0 hash and activation history remain unchanged.
+
+- Updated current public Testnet release and source commit.
+- Documented verified multipart bootstrap, wallet-first initialization, download resumption and canonical synchronization.
+- Updated official archive SHA-256 values for four platforms.
+- Preserved historical consensus activations and previous whitepaper editions.
+- No new hard fork or Testnet reset is introduced.
+
+
 ## v1.6 - Rabbit Core Testnet V2.3.6 operational release
 
 - Updated the current official Rabbit Core Testnet release identity to `v2.3.6`.
