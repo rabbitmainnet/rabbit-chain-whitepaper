@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.8 - Rabbit Core V2.4.25
+
+- Consolidated the V2.4.25 addendum into the main edition and regenerated PDF and ODT.
+- Updated the release identity, genesis file checksum and operator instructions.
+
 ## Testnet V2.4.25 technical addendum v1.0
 
 - Added a versioned supplement covering Rabbit Core distribution, LCQ operation, bootstrap, recovery and the status of Testnet VRF.

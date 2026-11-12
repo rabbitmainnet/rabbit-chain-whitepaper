@@ -2,14 +2,14 @@
 
 ## Permissionless EVM Layer 1 with Live Consensus Queue
 
-**Technical Whitepaper - Public Testnet V2 Edition v1.7**
-**19 October 2026**
+**Technical Whitepaper - Public Testnet V2 Edition v1.8**
+**12 November 2026**
 
 > One wallet. One persistent equal consensus seat.
 
 ---
 
-For Rabbit Core V2.4.25, see the [technical addendum v1.0](docs/Testnet-V2.4.25-Technical-Addendum.md), also available as [PDF](docs/Testnet-V2.4.25-Technical-Addendum.pdf) and [ODT](docs/Testnet-V2.4.25-Technical-Addendum.odt). The document status below records the v1.7 edition as published.
+[Whitepaper v1.8 (PDF)](https://github.com/rabbitmainnet/rabbit-chain-whitepaper/blob/main/docs/Rabbit-Chain-Whitepaper-v1.8.pdf) · [Whitepaper v1.8 (ODT)](https://github.com/rabbitmainnet/rabbit-chain-whitepaper/blob/main/docs/Rabbit-Chain-Whitepaper-v1.8.odt) · [Historical Whitepaper v1.7 (PDF)](https://github.com/rabbitmainnet/rabbit-chain-whitepaper/blob/main/docs/Rabbit-Chain-Whitepaper-v1.7.pdf)
 
 ## Document status
 
@@ -20,14 +20,14 @@ For Rabbit Core V2.4.25, see the [technical addendum v1.0](docs/Testnet-V2.4.25-
 | Native test asset | `tRAB` |
 | Consensus | LCQ with permissionless Work V2 admission |
 | Execution | EVM / EIP-1559 |
-| Current Rabbit Core release | `v2.4.13` |
-| Current source commit | `8e42d4fec6769dd44a593b552bfc570df227a6ac` |
+| Current Rabbit Core release | `v2.4.25` |
+| Current source commit | `4f502f971c3b3166be14da6e25fbc7c531404d42` |
 | Liveness V3 activation release | `rabbit-core-testnet-v2.3.0` |
 | Consensus hardening block | `50000` |
 | Consensus stabilization block | `50500` |
 | Fairness/Liveness activation block | `73000` |
 | Liveness V3 activation block | `77000` |
-| Genesis file SHA-256 | `17bfe51321f6e7befe8719ee35c34b1b876fda3e93672204903bd7b6d6bb69ba` |
+| Genesis file SHA-256 | `4970159f077b62b7aa9bde1f81cb61ae837b42ef64861d7b23241e1af4d75c9f` |
 | Canonical block-0 hash | `0x9b71d7f2922fdf8383a4a12be5594e25938625195e0d84c05c3bd71b7bcf93f7` |
 | Public RPC | <https://rpc-testnet.rabbitchain.org> |
 | Explorer | <https://explorer-testnet.rabbitchain.org> |
@@ -38,11 +38,35 @@ Testnet software and tRAB are experimental. Testnet assets have no promised mone
 **Software/protocol distinction.** Whitepaper v1.5 remains the Liveness V3 protocol edition. Rabbit Core V2.3.0 is the historical software release that activated Liveness V3 at canonical block 77000. Rabbit Core V2.3.4 is preserved as a prior software release record. Rabbit Core V2.3.6 is a historical Testnet client release; it does not introduce a new scheduled consensus activation block.
 
 
-### Rabbit Core v2.4.13 — verified automatic bootstrap
+### Rabbit Core v2.4.25 — verified automatic bootstrap
 
-The current public Testnet client initializes or reuses an encrypted mining wallet before downloading the official multipart blockchain bootstrap. Bootstrap parts are integrity-checked, interrupted downloads can resume, and the node then synchronizes remaining canonical blocks before LCQ participation. Existing operators must preserve their Testnet data directory, keystore, node identity and participation state. This is a software distribution and synchronization improvement, not a new consensus hard fork.
+Fresh installations use the official multipart bootstrap at block **385,509**. The launcher checks the parts and assembled data, supports interrupted-download resumption and synchronizes subsequent blocks through peers. Existing databases bypass fresh bootstrap. The archive is approximately 7.49 GiB compressed. The distributed genesis file SHA-256 is `4970159f077b62b7aa9bde1f81cb61ae837b42ef64861d7b23241e1af4d75c9f`.
 
-Source commit: `8e42d4fec6769dd44a593b552bfc570df227a6ac`. Official packages and SHA-256 checksums: https://github.com/rabbitmainnet/rabbit-geth/releases/tag/v2.4.13
+The V2.4.25 build includes earlier restart reconstruction and checkpoint handling, plus changes to synchronization recovery and miner cancellation relative to V2.4.23. After failed synchronization, production recovery checks canonical progress before resuming. RPC nodes serve blockchain data, and the Explorer indexes it separately. Their public availability and the synchronization of individual miners require separate observation.
+
+Source commit: `4f502f971c3b3166be14da6e25fbc7c531404d42`. Official packages and SHA-256 checksums: https://github.com/rabbitmainnet/rabbit-geth/releases/tag/v2.4.25
+
+### Current LCQ operations
+
+The configured producer-to-committee subsidy split is 70/30 when an eligible committee exists. An eligible producer can receive the full subsidy when no eligible committee exists. Emergency registry fallback with zero eligible WorkSeats can advance the chain without minting the normal WorkSeat subsidy. VRF fees follow separate rules.
+
+Missed assigned production turns can result in a canonical penalty. `PENALIZED` reports the expiry height and remaining blocks. The node still needs to be synchronized and eligible after expiry. Restarting with the same wallet and state retains the canonical seat.
+
+### Later Testnet activations and VRF
+
+| Public Testnet rule | Historical block |
+|---|---:|
+| LCQ stabilization | 50,500 |
+| Fairness and liveness | 73,000 |
+| Liveness V3, V4, V5 and V6 | 77,000 / 97,991 / 115,000 / 115,022 |
+| VRF DKG preparation | 136,065 |
+| VRF protocol and VRF liveness | 136,193 |
+| Mining reward V5 | 153,601 |
+| VRF Availability V2 | 173,057 |
+| VRF economics V2 and WorkSeat admission V2 | 320,000 |
+| WorkSeat liveness V2 | 323,800 |
+
+The V2.4.25 changes introduce no new scheduled activation height. The build includes authenticated VRF transport, DKG artifact replay changes and changes to finalization gossip. DKG prepares distributed signing material. A successful VRF request requires canonical fulfillment and a verifiable proof. Build and laboratory results establish neither public request completion rates nor Mainnet readiness.
 
 ## Abstract
 
@@ -721,13 +745,13 @@ On the public Testnet, user-facing mining rewards are denominated in `tRAB`, the
 
 ## 17. How to participate
 
-1. Open `https://rabbitchain.org/mining` and download the current Rabbit Core Testnet V2.4.13 release.
+1. Open `https://rabbitchain.org/mining` and download the current Rabbit Core Testnet V2.4.25 release.
 2. Download the appropriate Windows AMD64, Linux AMD64, macOS AMD64 or macOS ARM64 package and verify its published SHA-256 before running it.
-3. Start Rabbit Core, create a strong local password and back up the exact encrypted `UTC--...` keystore file it prints. Keep the password separately.
+3. Start Rabbit Core with `Start-Rabbit-Core.cmd` on Windows, `Start-Rabbit-Core.sh` on Linux or `Start-Rabbit-Core.command` on macOS, create a strong local password and back up the exact encrypted `UTC--...` keystore file it prints. Keep the password separately.
 4. Keep Rabbit Core open while it automatically connects to the Rabbit Testnet P2P network and synchronizes the canonical blockchain. No public RPC, WebSocket endpoint or manual peer configuration is required to begin mining.
 5. After synchronization, Work V2 may prepare the 1 GiB RandomX dataset and search for the wallet's one-time admission proof. This is admission work, not recurring LCQ block mining.
-6. After the proof is accepted, Rabbit Miner reports `LCQ PENDING`. No duplicate admission proof is needed; keep Rabbit Core running while canonical selection and activation progress.
-7. When Rabbit Miner reports `LCQ ACTIVE` / `ACTIVE LCQ seat`, the wallet owns one persistent equal consensus seat and is actively participating in LCQ.
+6. After the proof is accepted, Rabbit Miner reports `ADMISSION_PENDING` / `LCQ PENDING`. No duplicate admission proof is needed; keep Rabbit Core running while canonical selection and activation progress.
+7. When Rabbit Miner reports `ACTIVE_SEAT` / `LCQ ACTIVE`, the wallet owns one persistent equal consensus seat and is actively participating in LCQ.
 8. Keep Rabbit Core online. `PRODUCER` identifies blocks produced by the wallet, while `COMMITTEE` identifies committee rewards detected for it.
 
 | Operating system | Main Rabbit Core directory |
@@ -737,20 +761,20 @@ On the public Testnet, user-facing mining rewards are denominated in `tRAB`, the
 
 Within that directory, the wallet is under `keystore/UTC--...`, chain data under `rabbit/chaindata`, and logs under `logs/rabbit-node.log`. The `.rabbit-session-password-*` file is temporary and is not a backup.
 
-### 17.1 Required upgrade for existing participants
+### 17.1 Upgrade for existing participants
 
-The current recommended Rabbit Core Testnet release is **V2.4.13**. Releases older than **V2.3.0** are not compatible canonical producers beyond the Liveness V3 activation at block **77000**. V2.3.6 itself does not add a new consensus activation; it updates the official bootstrap and P2P discovery infrastructure.
+The current recommended Rabbit Core Testnet release is **V2.4.25**. See the [official release](https://github.com/rabbitmainnet/rabbit-geth/releases/tag/v2.4.25) for packages and checksums.
 
 1. Stop the older Rabbit Core normally.
-2. Download the official V2.4.13 package from <https://rabbitchain.org/mining/>.
+2. Download the official V2.4.25 package from <https://rabbitchain.org/mining/>.
 3. Verify the published package SHA-256.
 4. Extract the new release into a new program folder.
 5. Keep the existing Rabbit Testnet datadir, encrypted wallet, keystore, WorkSeat state and password.
-6. Start V2.4.13 using the normal Rabbit Core launcher.
+6. Start V2.4.25 using the normal Rabbit Core launcher.
 7. Keep Rabbit Core open while it reuses the existing local chain state and synchronizes to canonical history.
 8. Wait for canonical synchronization and `LCQ ACTIVE` before treating the wallet as an active canonical participant.
 
-Do **not** delete the blockchain, datadir, keystore or WorkSeat state as part of this upgrade. V2.4.13 preserves the existing Testnet V2 chain and consensus history.
+Do **not** delete the blockchain, datadir, keystore or WorkSeat state as part of this upgrade. V2.4.25 preserves the existing Testnet V2 chain and consensus history.
 
 
 Never give a password, private key, seed phrase or keystore to a website, RPC, explorer, faucet, administrator or support agent.
@@ -759,7 +783,7 @@ Never give a password, private key, seed phrase or keystore to a website, RPC, e
 
 ### Is the public testnet live?
 
-Yes. This edition documents the live Rabbit Testnet V2, chain ID 9280, its Work V2 admission lifecycle, the block-50000 consensus hardening, the block-50500 stabilization activation, the block-73000 Fairness/Liveness activation, the block-77000 Liveness V3 activation and the current Rabbit Core Testnet V2.4.13 release identity.
+Yes. This edition documents the live Rabbit Testnet V2, chain ID 9280, its Work V2 admission lifecycle, the block-50000 consensus hardening, the block-50500 stabilization activation, the block-73000 Fairness/Liveness activation, the block-77000 Liveness V3 activation and the current Rabbit Core Testnet V2.4.25 release identity.
 
 ### Does a seat guarantee blocks or income?
 
@@ -806,7 +830,7 @@ No promised monetary value. Any separate participation program follows its final
 
 Rabbit Chain proposes a specific change to permissionless block production: computational effort admits a wallet into a persistent deterministic live queue, while canonical state prevents that wallet from multiplying seats by multiplying processes. LCQ combines this wallet-bounded opportunity with EVM execution, RandomX work, deterministic producer authentication, committee rewards, fallback rules, and recoverable canonical state.
 
-The project should be judged by reproducible code and observable network behavior, not slogans. The current milestone is the fresh public Testnet V2 deployment whose genesis, binaries, infrastructure, rules, and evidence can be independently inspected from block 1.
+The project should be judged by reproducible code and observable network behavior, not slogans. The public Testnet V2 genesis, binaries, infrastructure, rules and evidence can be independently inspected from block 1.
 
 ---
 
@@ -823,6 +847,8 @@ The project should be judged by reproducible code and observable network behavio
 
 | Version | Date | Description |
 |---|---|---|
+| 1.8 | 12 November 2026 | Consolidated Rabbit Core V2.4.25 edition with release identity, bootstrap, recovery and VRF activation history. |
+| 1.7 | 19 October 2026 | Historical Rabbit Core V2.4.13 bootstrap edition. |
 | 1.6 | 26 September 2026 | Rabbit Core Testnet V2.3.6 operational release edition: refreshed official bootstrap and P2P discovery infrastructure, current Windows/Linux/macOS release identity and SHA-256 hashes, preserved Testnet V2 chain history, and no new consensus activation |
 | 1.5 | 16 September 2026 | Rabbit Core Testnet V2.3.0 Liveness V3 edition: block-77000 activation, deterministic producer rotation, bounded fallback recovery, committee participation claims, verified reward accounting and non-destructive upgrade |
 | 1.4 | 14 September 2026 | Rabbit Core Testnet V2.2.5 Fairness/Liveness edition: block-73000 activation, deterministic producer-order fairness, preserved committee filtering and fallback/recovery, in-place upgrade, hardened Rabbit Core restart behavior, and verified Windows/Linux release hashes |
