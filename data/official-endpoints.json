@@ -46,22 +46,23 @@
       "enode://2fac5ffabae5e2202666279e2d06f86b6f3f11977fa0818ad795889a55b32e2d4bd651bb5860fc6e88072a01cad23df475a36487cdcd496e97932909600b7791@157.245.245.16:30303",
       "enode://d106f46d3e37a5b8487b1a4b70a11519e77cf8c4532065a3508ebf943e44840867eaff2a4fa8e525e4dea6680d1aef7cb1c2824f3613fc3482b92eb026d357d4@24.144.112.140:30303"
     ],
-    "genesis_file_sha256": "17bfe51321f6e7befe8719ee35c34b1b876fda3e93672204903bd7b6d6bb69ba",
-    "release_tag": "v2.4.13",
-    "release_commit": "8e42d4fec6769dd44a593b552bfc570df227a6ac",
-    "release_url": "https://github.com/rabbitmainnet/rabbit-geth/releases/tag/v2.4.13",
+    "genesis_file_sha256": "4970159f077b62b7aa9bde1f81cb61ae837b42ef64861d7b23241e1af4d75c9f",
+    "release_tag": "v2.4.25",
+    "release_commit": "4f502f971c3b3166be14da6e25fbc7c531404d42",
+    "release_url": "https://github.com/rabbitmainnet/rabbit-geth/releases/tag/v2.4.25",
     "consensus_hardening_block": 50000,
-    "windows_amd64_sha256": "126a91466ebd50d9b367ab1aa77bcc126f3c0ea5a840fea4c74de70078d99119",
-    "linux_amd64_sha256": "950dd6040cec3832a259b78099d95803d01e3a55a942c1396f4317e7e069c3a3",
+    "windows_amd64_sha256": "7f6f9803245d85d231cb9f7f2073cfda5ed59a7271ec15c8b412451339adab80",
+    "linux_amd64_sha256": "bd1dd3b3bd38f362179ef48f6fe6ef6fc0380a0387042d2f052d096e5dbea9fa",
     "consensus_stabilization_block": 50500,
     "consensus_fairness_block": 73000,
     "release_assets_sha256": {
-      "windows_amd64_zip": "126a91466ebd50d9b367ab1aa77bcc126f3c0ea5a840fea4c74de70078d99119",
-      "linux_amd64_tar_gz": "950dd6040cec3832a259b78099d95803d01e3a55a942c1396f4317e7e069c3a3",
-      "darwin_amd64_tar_gz": "9ad48a0cd13105253cef469f17ef99580581ca8c6eec95f97e2863b0d09cb49d",
-      "darwin_arm64_tar_gz": "1be3637c0608977d8eb13da5308c64c34401f32ca2daad95567e2e2f3c78563b"
+      "windows_amd64_zip": "7f6f9803245d85d231cb9f7f2073cfda5ed59a7271ec15c8b412451339adab80",
+      "linux_amd64_tar_gz": "bd1dd3b3bd38f362179ef48f6fe6ef6fc0380a0387042d2f052d096e5dbea9fa",
+      "darwin_amd64_tar_gz": "3b45a4a092d85871860de024dc6aff2b147fd7d19a85317d5d501fda9b747a0c",
+      "darwin_arm64_tar_gz": "64ed6b1c295ae97f86c3d5e69096d51954eca700adc95c2bb615292312f7db0c"
     },
-    "consensus_liveness_v3_block": 77000
+    "consensus_liveness_v3_block": 77000,
+    "native_currency": "tRAB"
   },
   "mainnet": {
     "chain_id": 928,

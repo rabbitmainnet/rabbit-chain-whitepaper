@@ -9,6 +9,8 @@
 
 ---
 
+For Rabbit Core V2.4.25, see the [technical addendum v1.0](docs/Testnet-V2.4.25-Technical-Addendum.md), also available as [PDF](docs/Testnet-V2.4.25-Technical-Addendum.pdf) and [ODT](docs/Testnet-V2.4.25-Technical-Addendum.odt). The document status below records the v1.7 edition as published.
+
 ## Document status
 
 | Item | Public status |

@@ -1,5 +1,9 @@
 # Changelog
 
+## Testnet V2.4.25 technical addendum v1.0
+
+- Added a versioned supplement covering Rabbit Core distribution, LCQ operation, bootstrap, recovery and the status of Testnet VRF.
+
 ## v1.7 - Rabbit Core v2.4.13 automatic bootstrap edition
 
 - Reconciled the genesis file SHA-256 against the v2.4.13 source genesis; canonical block-0 hash and activation history remain unchanged.
